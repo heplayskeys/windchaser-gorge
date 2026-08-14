@@ -275,7 +275,7 @@
 
   /* ---------- Source accordion cards ---------- */
   .sources { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
-  .card { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; cursor: pointer; }
+  .card { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; }
   .card-content { padding: 1.05rem 1.15rem; display: flex; flex-direction: column; gap: 0.35rem; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
   .source-name { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; }
@@ -296,25 +296,26 @@
   }
   .copy-btn:hover { color: var(--text-hi); border-color: var(--text-low); }
   .copy-btn.copied { background: var(--green); border-color: var(--green); color: var(--green-ink); }
-  .toggle-hint-text {
+  .forecast-text { font-size: 0.93rem; line-height: 1.6; color: var(--text-mid); margin-top: 0.3rem; }
+  .badges.inline { padding-top: 0.7rem; }
+  .source-link {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 1rem;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: var(--yellow);
-    margin-top: 0.15rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--yellow-ink);
+    background: var(--yellow);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    min-height: 40px;
   }
-  .toggle-hint-text .arrow { transition: transform 0.2s ease; display: inline-block; }
-  .card.open .toggle-hint-text .arrow { transform: rotate(90deg); }
-  .card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-  .card.open .card-body { max-height: 900px; }
-  .card-body-inner { padding: 0 1.15rem 1.15rem; }
-  .forecast-text { font-size: 0.93rem; line-height: 1.6; color: var(--text-mid); }
-  .badges.inline { padding-top: 0.8rem; }
-  .source-link { display: inline-block; margin-top: 0.9rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-decoration: none; color: var(--text-low); border-bottom: 1px dotted var(--text-low); min-height: 30px; }
-  .source-link:hover { color: var(--text-hi); border-color: var(--text-hi); }
+  .source-link:hover { filter: brightness(1.08); }
 
   footer { padding: 1.8rem 0 0; font-size: 0.78rem; color: var(--text-low); line-height: 1.6; }
   footer a { color: var(--text-low); text-decoration: underline; }
@@ -341,8 +342,8 @@
     <a href="#glance" class="active">Glance</a>
     <a href="#zones">Zones</a>
     <a href="#outlook">Outlook</a>
-    <a href="#sources">Sources</a>
     <a href="#live">Live</a>
+    <a href="#sources">Sources</a>
   </div>
 </div>
 
@@ -387,8 +388,6 @@
     <div id="outlookRow" class="outlook-row"></div>
   </section>
 
-  <section id="sources" class="sources"></section>
-
   <section id="live" class="panel">
     <h2>Live Model Data</h2>
     <div class="sub" id="liveSub">Hood River, OR · Open-Meteo forecast model</div>
@@ -396,6 +395,8 @@
     <svg class="sparkline" id="sparkline" viewBox="0 0 300 64" preserveAspectRatio="none"></svg>
     <div class="spark-caption"><span>Now</span><span id="sparkEnd">+12h</span></div>
   </section>
+
+  <section id="sources" class="sources"></section>
 
   <footer>
     Human forecasts scraped once daily and normalized for readability — no
@@ -1152,19 +1153,10 @@ function render(data) {
         </div>
         ${s.credibility ? `<div class="credibility">${s.credibility}</div>` : ''}
         <div class="headline">${s.headline || ''}</div>
-        <div class="toggle-hint-text"><span class="arrow">▸</span> View full forecast</div>
-      </div>
-      <div class="card-body">
-        <div class="card-body-inner">
-          <div class="forecast-text">${s.forecast_text}</div>
-          <div class="badges inline">${(s.flags||[]).map(flagHTML).join('')}</div>
-          <a class="source-link" href="${s.url}" target="_blank" rel="noopener">Open original source →</a>
-        </div>
+        <div class="forecast-text">${s.forecast_text}</div>
+        <div class="badges inline">${(s.flags||[]).map(flagHTML).join('')}</div>
+        <a class="source-link" href="${s.url}" target="_blank" rel="noopener">Open original source →</a>
       </div>`;
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.copy-btn') || e.target.closest('a')) return;
-      card.classList.toggle('open');
-    });
     card.querySelector('.copy-btn').addEventListener('click', (e) => {
       e.stopPropagation();
       copySourceToClipboard(s, data.generated_at, e.currentTarget);

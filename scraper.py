@@ -515,14 +515,16 @@ WIND_RELEVANT_MARKERS = (
 
 def summarize_forecast(text: str, max_sentences: int = 3) -> str:
     """
-    Zero-cost, no-API extractive summary: split into sentences, drop
-    off-topic ones outright, then prefer sentences with an actual wind
-    number over ones that just mention "wind" as a word (otherwise
-    generic model-chatter like "solid westerlies each day" can crowd out
-    the real numbers). This is a filter, not true language understanding
-    — it won't paraphrase or compress a sentence, just choose which ones
-    to keep — but it reliably removes the donation asks / boilerplate
-    that were making the raw paragraph dump read as nonsense.
+    Zero-cost, no-API extractive summary, targeted at TODAY's wind
+    specifically: split into sentences, drop off-topic ones outright,
+    drop sentences that are about a different day ("returning Monday",
+    "Tuesday may be windier") unless they also mention "today", then
+    prefer whatever's left that has an actual wind number over sentences
+    that just mention "wind" as a word. This is a filter, not true
+    language understanding — it won't paraphrase or compress a sentence,
+    just choose which ones to keep — but it reliably removes the
+    donation asks / boilerplate / other-day chatter that were making the
+    raw paragraph dump read as nonsense.
     """
     if not text:
         return text
@@ -534,6 +536,8 @@ def summarize_forecast(text: str, max_sentences: int = 3) -> str:
             continue
         if not any(m in low for m in WIND_RELEVANT_MARKERS):
             continue
+        if any(day in low for day in DAY_NAMES) and "today" not in low and "tonight" not in low:
+            continue  # about a different day, not today
         s = s.strip()
         if re.search(r"\d{1,2}-\d{1,2}\s?mph|\d{1,2}\s?mph|\d{1,2}\s?kt", low):
             with_numbers.append(s)
