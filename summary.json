@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-13T14:00:00Z",
+  "generated_at": "2026-08-14T17:05:00Z",
   "sources": [
     {
       "source": "Victor the Inflictor",
       "url": "https://victortheinflictor.com",
-      "headline": "Mellow west wind today. Same tomorrow.",
-      "forecast_text": "Hazy skies strong wind is done until the weekend as gradients have weakened overnight. Not much to get winds going today. As smokey haze returns to the gorge by afternoon cancelling the thermal gradient. And wind to maybe 10-15 MPH at best. Picks up late day from Stevenson / Viento through the corridor by evening but no further east. Looks like more of the same tomorrow. With light wind again all day and a late day puff to 15 MPH at best. Stronger west winds return through the weekend with a big day out east on tuesday.",
+      "headline": "Hazy skies strong wind is done until the weekend as gradients have weakened overnight",
+      "forecast_text": "And wind to maybe 10-15 MPH at best. Hazy skies strong wind is done until the weekend as gradients have weakened overnight. Not much to get winds going today.",
       "credibility": "40+ years reading Gorge wind",
       "zones": [],
       "flags": [
@@ -35,14 +35,24 @@
     {
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
-      "headline": "Breezy through Wednesday, high fire danger ahead",
-      "forecast_text": "One last day of west wind before we tumble into a heat wave. Early wind was 6-10mph at Stevenson and the Rowena zone. In the afternoon, offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. Red flag warning as high fire danger continues.",
+      "headline": "Saturday 8/8 to Sunday 8/16 forecast: breezy through Wednesday, high fire danger ahead",
+      "forecast_text": "Early wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone. This gives us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. One last day of west wind is in the Gorge wind forecast before we tumble into a heat wave.",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
       "zones": [
         {
           "zone": "Stevenson",
-          "low": 6,
-          "high": 21
+          "low": 7,
+          "high": 25
+        },
+        {
+          "zone": "Viento",
+          "low": 16,
+          "high": 25
+        },
+        {
+          "zone": "Hood River",
+          "low": 17,
+          "high": 25
         },
         {
           "zone": "The Hatch",
@@ -51,71 +61,211 @@
         },
         {
           "zone": "Lyle",
-          "low": 17,
-          "high": 21
-        }
-      ],
-      "flags": [
-        {
-          "label": "Fire Danger",
-          "level": "warning",
-          "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
-          "where": "Lyle, Stevenson, the Hatch"
-        }
-      ],
-      "mph_mentions": [
-        {
-          "range": "6-10mph",
-          "where": "Rowena, Stevenson",
-          "context": "…Wind before we tumble into a heat wave. early wind was 6-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
+          "low": 14,
+          "high": 29
         },
         {
-          "range": "17-21mph",
+          "zone": "Rufus",
+          "low": 10,
+          "high": 29
+        },
+        {
+          "zone": "Roosevelt",
+          "low": 10,
+          "high": 25
+        }
+      ],
+      "flags": [],
+      "mph_mentions": [
+        {
+          "range": "16-19mph",
+          "where": "Hood River, Viento",
+          "context": "…D off with clear sky across the region. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso…"
+        },
+        {
+          "range": "7-10mph",
+          "where": "Hood River, Rowena, Stevenson, Viento",
+          "context": "…Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
+        },
+        {
+          "range": "21-24mph",
           "where": "Lyle, Stevenson, the Hatch",
-          "context": "…, Offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. r…"
+          "context": "…Ore high pressure strengthens. this gives us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch."
         },
         {
           "range": "17-20mph",
           "where": "Lyle, Stevenson, the Hatch",
-          "context": "…Iving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con…"
+          "context": "…Es us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch."
         }
       ],
       "time_segments": [
         {
           "period": "Early",
-          "low": 6,
-          "high": 10
+          "low": 7,
+          "high": 19
         },
         {
           "period": "Afternoon",
           "low": 17,
-          "high": 21
+          "high": 24
         }
       ],
       "zone_periods": [
         {
+          "zone": "Viento",
+          "period": "Early",
+          "low": 16,
+          "high": 19
+        },
+        {
           "zone": "Stevenson",
           "period": "Early",
-          "low": 6,
+          "low": 7,
           "high": 10
         },
         {
           "zone": "Stevenson",
           "period": "Afternoon",
-          "low": 17,
-          "high": 21
+          "low": 21,
+          "high": 25
         },
         {
           "zone": "Lyle",
           "period": "Afternoon",
-          "low": 17,
-          "high": 21
+          "low": 21,
+          "high": 29
         },
         {
           "zone": "The Hatch",
           "period": "Afternoon",
           "low": 17,
           "high": 20
+        },
+        {
+          "zone": "Stevenson",
+          "period": "Dawn",
+          "low": 13,
+          "high": 16
+        },
+        {
+          "zone": "Stevenson",
+          "period": "Morning",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Stevenson",
+          "period": "Evening",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Viento",
+          "period": "Dawn",
+          "low": 20,
+          "high": 23
+        },
+        {
+          "zone": "Viento",
+          "period": "Morning",
+          "low": 22,
+          "high": 25
+        },
+        {
+          "zone": "Viento",
+          "period": "Afternoon",
+          "low": 20,
+          "high": 23
+        },
+        {
+          "zone": "Viento",
+          "period": "Evening",
+          "low": 22,
+          "high": 25
+        },
+        {
+          "zone": "Hood River",
+          "period": "Dawn",
+          "low": 20,
+          "high": 23
+        },
+        {
+          "zone": "Hood River",
+          "period": "Morning",
+          "low": 22,
+          "high": 25
+        },
+        {
+          "zone": "Hood River",
+          "period": "Afternoon",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Hood River",
+          "period": "Evening",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Lyle",
+          "period": "Dawn",
+          "low": 14,
+          "high": 17
+        },
+        {
+          "zone": "Lyle",
+          "period": "Morning",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Lyle",
+          "period": "Evening",
+          "low": 22,
+          "high": 25
+        },
+        {
+          "zone": "Rufus",
+          "period": "Dawn",
+          "low": 10,
+          "high": 13
+        },
+        {
+          "zone": "Rufus",
+          "period": "Afternoon",
+          "low": 26,
+          "high": 29
+        },
+        {
+          "zone": "Rufus",
+          "period": "Evening",
+          "low": 26,
+          "high": 29
+        },
+        {
+          "zone": "Roosevelt",
+          "period": "Dawn",
+          "low": 10,
+          "high": 13
+        },
+        {
+          "zone": "Roosevelt",
+          "period": "Morning",
+          "low": 13,
+          "high": 16
+        },
+        {
+          "zone": "Roosevelt",
+          "period": "Afternoon",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Roosevelt",
+          "period": "Evening",
+          "low": 22,
+          "high": 25
         }
       ]
     }
@@ -123,9 +273,21 @@
   "zones": [
     {
       "zone": "Stevenson",
-      "low": 6,
-      "high": 21,
+      "low": 7,
+      "high": 25,
       "confirmed_by_both": true
+    },
+    {
+      "zone": "Viento",
+      "low": 16,
+      "high": 25,
+      "confirmed_by_both": true
+    },
+    {
+      "zone": "Hood River",
+      "low": 17,
+      "high": 25,
+      "confirmed_by_both": false
     },
     {
       "zone": "The Hatch",
@@ -135,8 +297,20 @@
     },
     {
       "zone": "Lyle",
-      "low": 17,
-      "high": 21,
+      "low": 14,
+      "high": 29,
+      "confirmed_by_both": false
+    },
+    {
+      "zone": "Rufus",
+      "low": 10,
+      "high": 29,
+      "confirmed_by_both": false
+    },
+    {
+      "zone": "Roosevelt",
+      "low": 10,
+      "high": 25,
       "confirmed_by_both": false
     }
   ],
@@ -146,23 +320,18 @@
       "level": "caution",
       "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
       "where": null
-    },
-    {
-      "label": "Fire Danger",
-      "level": "warning",
-      "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
-      "where": "Lyle, Stevenson, the Hatch"
     }
   ],
   "agreement_zones": [
-    "Stevenson"
+    "Stevenson",
+    "Viento"
   ],
   "direction": "westerly",
   "weekly_outlook": [
     {
       "day": "Fri",
-      "low": 6,
-      "high": 21,
+      "low": 7,
+      "high": 29,
       "direction": "westerly"
     },
     {
@@ -205,39 +374,171 @@
   "time_segments": [
     {
       "period": "Early",
-      "low": 6,
-      "high": 10
+      "low": 7,
+      "high": 19
     },
     {
       "period": "Afternoon",
       "low": 10,
-      "high": 21
+      "high": 24
     }
   ],
   "zone_periods": [
     {
+      "zone": "Viento",
+      "period": "Early",
+      "low": 16,
+      "high": 19
+    },
+    {
       "zone": "Stevenson",
       "period": "Early",
-      "low": 6,
+      "low": 7,
       "high": 10
     },
     {
       "zone": "Stevenson",
       "period": "Afternoon",
-      "low": 17,
-      "high": 21
+      "low": 21,
+      "high": 25
     },
     {
       "zone": "Lyle",
       "period": "Afternoon",
-      "low": 17,
-      "high": 21
+      "low": 21,
+      "high": 29
     },
     {
       "zone": "The Hatch",
       "period": "Afternoon",
       "low": 17,
       "high": 20
+    },
+    {
+      "zone": "Stevenson",
+      "period": "Dawn",
+      "low": 13,
+      "high": 16
+    },
+    {
+      "zone": "Stevenson",
+      "period": "Morning",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Stevenson",
+      "period": "Evening",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Viento",
+      "period": "Dawn",
+      "low": 20,
+      "high": 23
+    },
+    {
+      "zone": "Viento",
+      "period": "Morning",
+      "low": 22,
+      "high": 25
+    },
+    {
+      "zone": "Viento",
+      "period": "Afternoon",
+      "low": 20,
+      "high": 23
+    },
+    {
+      "zone": "Viento",
+      "period": "Evening",
+      "low": 22,
+      "high": 25
+    },
+    {
+      "zone": "Hood River",
+      "period": "Dawn",
+      "low": 20,
+      "high": 23
+    },
+    {
+      "zone": "Hood River",
+      "period": "Morning",
+      "low": 22,
+      "high": 25
+    },
+    {
+      "zone": "Hood River",
+      "period": "Afternoon",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Hood River",
+      "period": "Evening",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Lyle",
+      "period": "Dawn",
+      "low": 14,
+      "high": 17
+    },
+    {
+      "zone": "Lyle",
+      "period": "Morning",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Lyle",
+      "period": "Evening",
+      "low": 22,
+      "high": 25
+    },
+    {
+      "zone": "Rufus",
+      "period": "Dawn",
+      "low": 10,
+      "high": 13
+    },
+    {
+      "zone": "Rufus",
+      "period": "Afternoon",
+      "low": 26,
+      "high": 29
+    },
+    {
+      "zone": "Rufus",
+      "period": "Evening",
+      "low": 26,
+      "high": 29
+    },
+    {
+      "zone": "Roosevelt",
+      "period": "Dawn",
+      "low": 10,
+      "high": 13
+    },
+    {
+      "zone": "Roosevelt",
+      "period": "Morning",
+      "low": 13,
+      "high": 16
+    },
+    {
+      "zone": "Roosevelt",
+      "period": "Afternoon",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Roosevelt",
+      "period": "Evening",
+      "low": 22,
+      "high": 25
     }
   ]
 }

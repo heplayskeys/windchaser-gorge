@@ -1093,11 +1093,11 @@ function updateGlanceAndZones(period) {
   if (highBand) document.getElementById('rangeReadout').style.color = highBand.color;
   document.getElementById('zonesSub').textContent = `Today's wind — ${directionLabel(currentData.direction).toUpperCase()}`;
 
-  const periodLabel = period !== 'All Day' ? `<span class="sub-note">Viewing: ${period}</span><br>` : '';
+  const periodLabel = `<span class="sub-note">Viewing: ${period}</span><br>`;
   const bestSpotName = (hiKn !== null && hiKn < 15) ? '<span class="pineapple">🍍</span>' : (best ? best.zone : null);
   document.getElementById('callText').innerHTML = best
     ? `${periodLabel}<strong>Best spot:</strong> ${bestSpotName}`
-    : `<span class="sub-note">No precise zone data for this period — try All Day.</span>`;
+    : `${periodLabel}<span class="sub-note">No precise zone data for this period — try All Day.</span>`;
 
   drawGaugeRange(loKn, hiKn, loKn !== null ? windBand(loKn).color : '#000', hiKn !== null ? windBand(hiKn).color : '#000');
 }

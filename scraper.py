@@ -28,6 +28,14 @@ from datetime import datetime, timezone
 import requests
 from bs4 import BeautifulSoup
 
+try:
+    from io import BytesIO
+    from PIL import Image
+    import pytesseract
+    OCR_AVAILABLE = True
+except ImportError:
+    OCR_AVAILABLE = False
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; GorgeDashboardBot/1.0; personal use)"
 }
@@ -38,7 +46,7 @@ GORGE_GYM_URL = "https://thegorgeismygym.com/forecast"
 # Geographic order, west to east, used to sort the zone chart the same way
 # the wind actually moves through the corridor.
 ZONE_ORDER = [
-    "coast", "astoria", "corridor", "cascade locks", "stevenson", "wyeth",
+    "coast", "astoria", "rooster rock", "corridor", "cascade locks", "stevenson", "wyeth",
     "viento", "hood river", "the hatch", "hatch", "hatchery", "mosier",
     "rowena", "the dalles", "doug's", "dougs", "lyle", "the wall", "wall",
     "swell", "celilo", "rufus", "arlington", "roosevelt", "pasco", "desert",
@@ -481,7 +489,62 @@ def extract_flags(text: str):
     return flags
 
 
-def clean(text: str) -> str:
+# Sentences containing any of these are dropped outright — donation asks,
+# site-maintenance boilerplate, and tangents that have nothing to do with
+# today's wind. This is the biggest single quality win: it's what was
+# letting "please Venmo me" and cache-refresh instructions into the summary.
+OFFTOPIC_MARKERS = (
+    "venmo", "paypal", "donat", "subscribe", "contribut", " tip ", "tip temira",
+    "hard refresh", "incognito", "flushing your cache", "still seeing yesterday",
+    "trail", "closure", "work party", "humidity", "partly cloudy", "sunny,",
+    "around the world", "safe travels", "have a great week", "see you on the",
+    "fingers crossed", "hold off on any solid planning",
+    "ikite", "iwind", "sensor", "reads low", "reads high", "think like a local",
+)
+
+# Sentences containing any of these are considered genuinely wind-relevant
+# and kept (after off-topic sentences are already dropped). A sentence with
+# none of these markers and no actual wind number is dropped too — it's
+# almost always scene-setting chit-chat ("Friday started off with clear
+# sky...") rather than something worth showing in a short summary.
+WIND_RELEVANT_MARKERS = (
+    "mph", "wind", "gust", "kt ", "westerly", "easterly", "northerly", "southerly",
+    "advisory", "warning", "smoke", "haze", "fire danger",
+)
+
+
+def summarize_forecast(text: str, max_sentences: int = 3) -> str:
+    """
+    Zero-cost, no-API extractive summary: split into sentences, drop
+    off-topic ones outright, then prefer sentences with an actual wind
+    number over ones that just mention "wind" as a word (otherwise
+    generic model-chatter like "solid westerlies each day" can crowd out
+    the real numbers). This is a filter, not true language understanding
+    — it won't paraphrase or compress a sentence, just choose which ones
+    to keep — but it reliably removes the donation asks / boilerplate
+    that were making the raw paragraph dump read as nonsense.
+    """
+    if not text:
+        return text
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    with_numbers, without_numbers = [], []
+    for s in sentences:
+        low = s.lower()
+        if any(m in low for m in OFFTOPIC_MARKERS):
+            continue
+        if not any(m in low for m in WIND_RELEVANT_MARKERS):
+            continue
+        s = s.strip()
+        if re.search(r"\d{1,2}-\d{1,2}\s?mph|\d{1,2}\s?mph|\d{1,2}\s?kt", low):
+            with_numbers.append(s)
+        else:
+            without_numbers.append(s)
+
+    kept = (with_numbers + without_numbers)[:max_sentences]
+    return " ".join(kept) if kept else text  # fall back to raw text rather than showing nothing
+
+
+
     text = re.sub(r"\s+", " ", text).strip()
     return text.replace("…", "...")
 
@@ -531,7 +594,7 @@ def scrape_victor():
         "source": "Victor the Inflictor",
         "url": VTI_URL,
         "headline": headline,
-        "forecast_text": normalized,
+        "forecast_text": summarize_forecast(normalized) if raw_text else normalized,
         "credibility": CREDIBILITY["Victor the Inflictor"],
         "zones": extract_zones(raw_text),
         "flags": extract_flags(raw_text),
@@ -542,8 +605,144 @@ def scrape_victor():
     }
 
 
+# Row labels as they appear in Temira's wind table, mapped to our own zone
+# vocabulary. Calibrated from one real sample image (Aug 2026) — her row
+# order/colors have been stable across the samples checked, but this is
+# the part most likely to need adjustment if her table design changes.
+WINDTABLE_LABEL_ALIASES = {
+    "rooster rock": "Rooster Rock", "iwash": "Rooster Rock",
+    "stevenson": "Stevenson",
+    "viento": "Viento",
+    "swell-hood river": "Hood River", "hood river": "Hood River",
+    "lyle-doug's": "Lyle", "lyle": "Lyle", "doug's": "Lyle",
+    "rufus": "Rufus",
+    "roosevelt": "Roosevelt", "arlington": "Arlington",
+}
+# Skip rows that aren't wind-zone data at all (river flow / temperature rows)
+WINDTABLE_SKIP_LABELS = ("river flow", "temps", "temp")
+
+WINDTABLE_PERIODS = ["Dawn", "Morning", "Afternoon", "Evening"]  # Dawn Patrol / morning / afternoon / later
+
+
+def _is_true_border_color(c):
+    r, g, b = c[:3]
+    if not (abs(r - g) < 10 and abs(g - b) < 10 and abs(r - b) < 10):
+        return False
+    return 100 < r < 250
+
+
+def _is_near_white(c):
+    r, g, b = c[:3]
+    return r > 245 and g > 245 and b > 245
+
+
+def _detect_row_bands(img):
+    """Find each colored row's (y_start, y_end) by scanning down the label
+    column and grouping contiguous non-border/non-white runs."""
+    w, h = img.size
+    x_sample = int(w * 0.10)
+    bands, in_band, band_start = [], False, None
+    for y in range(h):
+        c = img.getpixel((x_sample, y))
+        is_sep = _is_true_border_color(c) or _is_near_white(c)
+        if not is_sep and not in_band:
+            in_band, band_start = True, y
+        elif is_sep and in_band:
+            in_band = False
+            if y - band_start > 12:
+                bands.append((band_start, y))
+    if in_band and h - band_start > 12:
+        bands.append((band_start, h))
+    return bands
+
+
+def _ocr_crop(img, box, psm=7):
+    crop = img.crop(box)
+    big = crop.resize((crop.width * 4, crop.height * 4), Image.LANCZOS)
+    return pytesseract.image_to_string(big, config=f"--psm {psm}").strip()
+
+
+def _match_windtable_label(label_text):
+    low = label_text.lower()
+    if any(skip in low for skip in WINDTABLE_SKIP_LABELS):
+        return None
+    for key, zone in WINDTABLE_LABEL_ALIASES.items():
+        if key in low:
+            return zone
+    return None
+
+
+def extract_windtable(image_bytes):
+    """
+    Full pipeline: detect each row's color band, OCR its label column and
+    each of the 4 period columns SEPARATELY (isolating each region gave
+    near-perfect accuracy in testing, and — importantly — OCR'ing columns
+    independently instead of parsing one merged string keeps positional
+    integrity when a cell says something non-numeric like "BUILDING",
+    which would otherwise silently shift every later column out of place).
+    Any failure here degrades gracefully — this is an enrichment on top
+    of the text-based extraction, not a replacement.
+    """
+    if not OCR_AVAILABLE:
+        return []
+    try:
+        img = Image.open(BytesIO(image_bytes)).convert("RGB")
+    except Exception:
+        return []
+
+    w, h = img.size
+    bands = _detect_row_bands(img)
+    results = []
+
+    data_x0, data_x1 = int(w * 0.28), w
+    col_w = (data_x1 - data_x0) / 4
+
+    for (y0, y1) in bands:
+        label_text = _ocr_crop(img, (0, max(0, y0 - 2), int(w * 0.27), y1 + 2))
+        zone = _match_windtable_label(label_text)
+        if not zone:
+            continue  # unrecognized or non-wind row (river flow, temps, header)
+
+        for i, period in enumerate(WINDTABLE_PERIODS):
+            cx0 = int(data_x0 + i * col_w)
+            cx1 = int(data_x0 + (i + 1) * col_w)
+            cell_text = _ocr_crop(img, (cx0, max(0, y0 - 2), cx1, y1 + 2))
+            m = re.search(r"(\d{1,2})-(\d{1,2})", cell_text)
+            if not m:
+                continue  # non-numeric cell (e.g. "BUILDING", "clearing") — skip, don't shift
+            lo, hi = int(m.group(1)), int(m.group(2))
+            results.append({"zone": zone, "period": period, "low": lo, "high": hi})
+
+    return results
+
+
+def fetch_windtable_image_url(soup):
+    """Find the wind table image — it sits between the main heading and
+    the SHORT-TERM subheading, named windtable-N.png (N changes daily,
+    so we find it by position/filename pattern, not a guessed URL)."""
+    img_tag = soup.find("img", src=re.compile(r"windtable", re.I))
+    if img_tag and img_tag.get("src"):
+        return img_tag["src"]
+    return None
+
+
 def scrape_gorge_gym():
     soup = fetch(GORGE_GYM_URL)
+
+    # Wind table image (Dawn Patrol / morning / afternoon / later by zone) —
+    # try to OCR it for a richer per-period breakdown than the prose alone
+    # gives us. Fully optional: any failure here (network, OCR unavailable,
+    # image layout changed) just yields an empty list, no impact on the
+    # rest of the scrape.
+    windtable_entries = []
+    try:
+        img_url = fetch_windtable_image_url(soup)
+        if img_url and OCR_AVAILABLE:
+            resp = requests.get(img_url, headers=HEADERS, timeout=20)
+            resp.raise_for_status()
+            windtable_entries = extract_windtable(resp.content)
+    except Exception as e:
+        print(f"WARNING: windtable OCR failed: {e}", file=sys.stderr)
 
     # Anchor to the SHORT-TERM subheading specifically, not the top-level
     # "GORGE WIND FORECAST" heading — a sensor-calibration disclaimer
@@ -602,17 +801,36 @@ def scrape_gorge_gym():
             headline_raw = txt
             break
 
+    prose_zones = extract_zones(raw_text)
+    prose_zone_periods = extract_zone_periods(raw_text)
+
+    # Combine windtable OCR data with prose-based extraction: for zone_periods,
+    # merge the two lists (dedupes/aggregates any zone+period overlap). For
+    # the All-Day zones list, aggregate each windtable zone's low/high across
+    # its 4 periods, then merge with whatever the prose extraction found.
+    combined_zone_periods = merge_zone_periods([prose_zone_periods, windtable_entries])
+
+    windtable_alldae = {}
+    for e in windtable_entries:
+        z = e["zone"]
+        if z not in windtable_alldae:
+            windtable_alldae[z] = {"zone": z, "low": e["low"], "high": e["high"]}
+        else:
+            windtable_alldae[z]["low"] = min(windtable_alldae[z]["low"], e["low"])
+            windtable_alldae[z]["high"] = max(windtable_alldae[z]["high"], e["high"])
+    combined_zones = merge_zones([prose_zones, list(windtable_alldae.values())])
+
     return {
         "source": "The Gorge Is My Gym (Temira)",
         "url": GORGE_GYM_URL,
         "headline": headline_raw,
-        "forecast_text": raw_text or "Forecast text not found — site layout may have changed.",
+        "forecast_text": summarize_forecast(raw_text) if raw_text else "Forecast text not found — site layout may have changed.",
         "credibility": CREDIBILITY["The Gorge Is My Gym (Temira)"],
-        "zones": extract_zones(raw_text),
+        "zones": combined_zones,
         "flags": extract_flags(raw_text),
         "mph_mentions": extract_mph_mentions(raw_text),
         "time_segments": extract_time_segments(raw_text),
-        "zone_periods": extract_zone_periods(raw_text),
+        "zone_periods": combined_zone_periods,
         "_mentions": extract_zone_mentions(raw_text),
         "_outlook_text": outlook_text,  # used only for the weekly outlook, stripped before writing
     }
