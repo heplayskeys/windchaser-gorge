@@ -112,21 +112,19 @@
 
   /* ---------- Agreement callout ---------- */
   .agreement {
-    margin-top: 1.1rem;
-    background: var(--panel-raised);
-    border: 1px solid var(--yellow);
-    border-radius: 8px;
-    padding: 0.75rem 0.95rem;
+    margin-top: 0.9rem;
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    align-items: baseline;
+    gap: 0.5rem;
   }
-  .agreement .icon { font-size: 1.1rem; }
-  .agreement .txt { font-size: 0.85rem; color: var(--text-hi); }
-  .agreement .txt b { color: var(--yellow); }
+  .agreement .icon { font-size: 1rem; }
+  .agreement .txt { font-size: 0.85rem; color: var(--text-mid); }
+  .agreement .txt b { color: var(--yellow); font-weight: 700; }
 
   /* ---------- Gauge + glance ---------- */
+  .section-divider { border: none; border-top: 1px solid var(--panel-line); margin: 0.9rem 0; }
   .glance { display: flex; align-items: center; gap: 1.5rem; padding: 1.4rem 0 0.4rem; flex-wrap: wrap; }
+
   .gauge { flex: 0 0 auto; width: 120px; height: 120px; }
   .gauge-readout { flex: 1 1 200px; }
   .gauge-readout .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(2.2rem, 10vw, 2.9rem); color: var(--yellow); line-height: 1; }
@@ -219,16 +217,27 @@
   .pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
+    gap: 0;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.72rem;
     font-weight: 600;
-    padding: 0.3rem 0.6rem;
+    padding: 0.3rem 0.55rem;
     border-radius: 5px;
     min-height: 30px;
+    min-width: 30px;
     border: none;
     cursor: pointer;
   }
+  .pill-icon { flex: 0 0 auto; font-size: 0.85rem; line-height: 1; }
+  .pill-label {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: max-width 0.22s ease, opacity 0.18s ease, margin-left 0.22s ease;
+  }
+  .pill.expanded .pill-label { max-width: 160px; opacity: 1; margin-left: 0.35rem; }
   .pill.flag-pill {
     background: transparent;
     border: 1.5px dashed var(--panel-line);
@@ -339,7 +348,10 @@
 
 <div class="wrap">
   <div class="badges" id="badgesWrap"></div>
+
+  <hr class="section-divider">
   <div id="agreementWrap"></div>
+  <hr class="section-divider">
 
   <section id="glance" class="glance">
     <svg class="gauge" viewBox="-8 -8 136 136" id="gaugeSvg">
@@ -468,7 +480,9 @@ function flagHTML(f) {
   const icon = FLAG_ICONS[f.label] || '⚠️';
   const whereText = f.where ? f.where.split(', ').map(titleCase).join('<br>') : 'Applies generally today';
   return `<span class="chip-pop">
-    <button type="button" class="pill flag-pill ${f.level}">${icon} ${f.label}</button>
+    <button type="button" class="pill flag-pill ${f.level}">
+      <span class="pill-icon">${icon}</span><span class="pill-label">${f.label}</span>
+    </button>
     <span class="chip-pop-body" hidden>${whereText}</span>
   </span>`;
 }
@@ -484,14 +498,21 @@ function setupTooltipDismiss(root) {
     let timer = null;
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isHidden = body.hasAttribute('hidden');
+      const wasExpanded = btn.classList.contains('expanded');
+      // accordion: collapse/hide every other pill first
+      document.querySelectorAll('.pill.expanded').forEach(b => { if (b !== btn) b.classList.remove('expanded'); });
       document.querySelectorAll('.chip-pop-body').forEach(b => { if (b !== body) b.setAttribute('hidden', ''); });
       clearTimeout(timer);
-      if (isHidden) {
-        body.removeAttribute('hidden');
-        timer = setTimeout(() => body.setAttribute('hidden', ''), 2500);
-      } else {
+      if (wasExpanded) {
+        // tapped the already-expanded pill again — collapse it fully
+        btn.classList.remove('expanded');
         body.setAttribute('hidden', '');
+      } else {
+        btn.classList.add('expanded');
+        body.removeAttribute('hidden');
+        // tooltip itself auto-hides after 2.5s, but the pill stays
+        // expanded (label visible) until tapped again or another pill opens
+        timer = setTimeout(() => body.setAttribute('hidden', ''), 2500);
       }
     });
   });
@@ -1194,11 +1215,14 @@ function arcPath(cx, cy, r, startDeg, endDeg) {
   const largeArc = (endDeg - startDeg) > 180 ? 1 : 0;
   return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
 }
+let gaugeAnimFrame = null;
+
 function drawGaugeRange(loKn, hiKn, colorLo, colorHi) {
   const bg = document.getElementById('gaugeBgArc');
   if (!bg.getAttribute('d')) bg.setAttribute('d', arcPath(60, 60, 36, -120, 120));
   const arc = document.getElementById('gaugeArc');
   const defs = document.getElementById('gaugeDefs');
+  if (gaugeAnimFrame) cancelAnimationFrame(gaugeAnimFrame);
   if (loKn == null || hiKn == null) {
     arc.setAttribute('d', '');
     return;
@@ -1211,7 +1235,6 @@ function drawGaugeRange(loKn, hiKn, colorLo, colorHi) {
     endDeg = Math.min(120, startDeg + MIN_SPAN_DEG);
     startDeg = endDeg - MIN_SPAN_DEG; // re-clamp in case endDeg hit the ceiling
   }
-  arc.setAttribute('d', arcPath(60, 60, 36, startDeg, endDeg));
   arc.setAttribute('stroke-width', '8');
 
   // Gradient along the chord between the arc's two endpoints, so the fill
@@ -1223,6 +1246,19 @@ function drawGaugeRange(loKn, hiKn, colorLo, colorHi) {
     <stop offset="100%" stop-color="${colorHi}"/>
   </linearGradient>`;
   arc.setAttribute('stroke', 'url(#gaugeGrad)');
+
+  // Animate the arc sweeping from the low angle to the high angle — a
+  // quick fill-up effect each time a zone or period is selected.
+  const duration = 600;
+  const t0 = performance.now();
+  function frame(now) {
+    const t = Math.min(1, (now - t0) / duration);
+    const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+    const currentEnd = startDeg + (endDeg - startDeg) * eased;
+    arc.setAttribute('d', arcPath(60, 60, 36, startDeg, currentEnd));
+    if (t < 1) gaugeAnimFrame = requestAnimationFrame(frame);
+  }
+  gaugeAnimFrame = requestAnimationFrame(frame);
 }
 
 function renderBadges(container, flags) {
@@ -1477,12 +1513,32 @@ function render(data) {
 function setupNavHighlight() {
   const links = document.querySelectorAll('.segmented a');
   const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+
+  // Intercept clicks instead of letting native anchor navigation update the
+  // URL hash — otherwise whichever tab was last tapped gets baked into the
+  // address bar, and "Add to Home Screen" saves THAT url, so the icon
+  // always relaunches straight into that section instead of the top.
+  links.forEach((l, i) => {
+    l.addEventListener('click', (e) => {
+      e.preventDefault();
+      sections[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
   window.addEventListener('scroll', () => {
     let idx = 0;
     sections.forEach((sec, i) => { if (sec && window.scrollY >= sec.offsetTop - 90) idx = i; });
     links.forEach((l, i) => l.classList.toggle('active', i === idx));
   });
 }
+
+// Safety net for a home-screen icon that was already saved with a #section
+// hash baked into its URL from before the fix above: strip it and jump to
+// the true top on load, rather than leaving old icons broken forever.
+if (window.location.hash) {
+  history.replaceState(null, '', window.location.pathname + window.location.search);
+}
+window.scrollTo(0, 0);
 
 loadData().then(data => { render(data); setupNavHighlight(); });
 loadLive().then(renderLive);
