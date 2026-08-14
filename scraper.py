@@ -21,6 +21,7 @@ structure is assumed stable but worth spot-checking occasionally.
 """
 
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -548,6 +549,46 @@ def summarize_forecast(text: str, max_sentences: int = 3) -> str:
     return " ".join(kept) if kept else text  # fall back to raw text rather than showing nothing
 
 
+# Free-tier Google Gemini API, used only for a single supplementary
+# one-sentence "AI summary" per source — NOT the source of truth for any
+# numbers on the dashboard (the regex-based zone extraction still owns
+# that). Uses the "latest" alias rather than a pinned version so this
+# doesn't break every time Google cycles model names.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = "gemini-flash-lite-latest"
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
+
+
+def ai_summarize(raw_text: str):
+    """
+    One-sentence AI summary of today's forecast. Returns None on ANY
+    failure — no key configured, network error, rate limit, unexpected
+    response shape — so a bad day for the API never breaks the scrape.
+    The dashboard shows a plain "No summary available" fallback in that case.
+    """
+    if not GEMINI_API_KEY or not raw_text:
+        return None
+    prompt = (
+        "Summarize this kiteboarding wind forecast in ONE short sentence "
+        "(under 30 words), focused only on today's conditions. No preamble, "
+        "no caveats, just the sentence:\n\n" + raw_text
+    )
+    try:
+        resp = requests.post(
+            GEMINI_URL,
+            headers={"Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY},
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=20,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        return text or None
+    except Exception as e:
+        print(f"WARNING: AI summary failed: {e}", file=sys.stderr)
+        return None
+
+
 def clean(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     return text.replace("…", "...")
@@ -593,6 +634,7 @@ def scrape_victor():
         "source": "Victor the Inflictor",
         "url": VTI_URL,
         "credibility": CREDIBILITY["Victor the Inflictor"],
+        "ai_summary": ai_summarize(raw_text),
         "zones": extract_zones(raw_text),
         "flags": extract_flags(raw_text),
         "mph_mentions": extract_mph_mentions(raw_text),
@@ -810,6 +852,7 @@ def scrape_gorge_gym():
         "source": "The Gorge Is My Gym (Temira)",
         "url": GORGE_GYM_URL,
         "credibility": CREDIBILITY["The Gorge Is My Gym (Temira)"],
+        "ai_summary": ai_summarize(raw_text),
         "zones": combined_zones,
         "flags": extract_flags(raw_text),
         "mph_mentions": extract_mph_mentions(raw_text),

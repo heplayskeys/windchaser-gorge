@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-08-14T06:50:43.237806+00:00",
+  "generated_at": "2026-08-14T16:23:44.239001+00:00",
   "sources": [
     {
       "source": "Victor the Inflictor",
       "url": "https://victortheinflictor.com",
       "credibility": "40+ years reading Gorge wind",
+      "ai_summary": "Light, hazy conditions today with wind topping out near 10-15mph, picking up modestly by evening near Stevenson and Viento.",
       "zones": [],
       "flags": [
         {
@@ -34,6 +35,7 @@
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
+      "ai_summary": "Expect an upgrade this afternoon with 21-24mph winds from Stevenson to Doug's, and 17-20mph at the Hatch, marking the last day of west wind before a heat wave.",
       "zones": [
         {
           "zone": "Stevenson",

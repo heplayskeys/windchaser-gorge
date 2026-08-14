@@ -6,6 +6,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1420">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Gorge Wind — Today's Conditions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -129,7 +130,7 @@
   .gauge { flex: 0 0 auto; width: 120px; height: 120px; }
   .gauge-readout { flex: 1 1 200px; }
   .gauge-readout .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(2.2rem, 10vw, 2.9rem); color: var(--yellow); line-height: 1; }
-  .gauge-readout .range span { font-size: 0.4em; color: var(--text-mid); font-family: 'IBM Plex Mono', monospace; font-weight: 500; margin-left: 0.3rem; }
+  .gauge-readout .range span { display: block; font-size: 0.42em; color: var(--text-mid); font-family: 'IBM Plex Mono', monospace; font-weight: 500; margin-top: 0.25rem; letter-spacing: 0.02em; }
   .gauge-readout .call { margin-top: 0.5rem; font-size: 0.98rem; color: var(--text-mid); line-height: 1.5; }
   .gauge-readout .call strong { color: var(--text-hi); font-weight: 700; }
   .gauge-readout .call .pineapple { font-size: 1.6em; line-height: 1; display: inline-block; vertical-align: middle; transform: translateY(2px); }
@@ -194,9 +195,8 @@
   .zone-kite-header { flex: 0 0 54px; text-align: right; line-height: 1; color: var(--text-mid); display: flex; justify-content: flex-end; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
   .skull-swatch { width: auto; height: auto; font-size: 0.75rem; line-height: 1; background: none !important; }
 
-  .outlook-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 340px; margin: 0 auto; }
+  .outlook-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
   .outlook-day {
-    flex: 0 0 76px;
     min-height: 108px;
     display: flex;
     flex-direction: column;
@@ -204,7 +204,7 @@
     background: var(--panel-raised);
     border: 1px solid var(--panel-line);
     border-radius: 9px;
-    padding: 0.7rem 0.35rem;
+    padding: 0.6rem 0.2rem;
     text-align: center;
   }
   .outlook-day .dname { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); margin-bottom: 0.35rem; }
@@ -294,6 +294,17 @@
   .card.yellow-edge .source-name { color: var(--yellow); }
   .ext-link-icon { flex: 0 0 auto; opacity: 0.85; }
   .credibility { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); }
+  .ai-summary { margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px dashed var(--panel-line); }
+  .ai-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.64rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-low);
+    margin-bottom: 0.3rem;
+  }
+  .ai-summary p { font-size: 0.88rem; line-height: 1.5; color: var(--text-mid); }
   .headline { font-size: 0.94rem; color: var(--text-mid); }
 
   footer { padding: 1.8rem 0 0; font-size: 0.78rem; color: var(--text-low); line-height: 1.6; }
@@ -524,12 +535,13 @@ async function loadData() {
     return await res.json();
   } catch (e) {
     return {
-      "generated_at": "2026-08-14T06:50:43.237806+00:00",
+      "generated_at": "2026-08-14T16:23:44.239001+00:00",
       "sources": [
             {
                   "source": "Victor the Inflictor",
                   "url": "https://victortheinflictor.com",
                   "credibility": "40+ years reading Gorge wind",
+                  "ai_summary": "Light, hazy conditions today with wind topping out near 10-15mph, picking up modestly by evening near Stevenson and Viento.",
                   "zones": [],
                   "flags": [
                         {
@@ -559,6 +571,7 @@ async function loadData() {
                   "source": "The Gorge Is My Gym (Temira)",
                   "url": "https://thegorgeismygym.com/forecast",
                   "credibility": "Hyperlocal Gorge forecaster since 2006",
+                  "ai_summary": "Expect an upgrade this afternoon with 21-24mph winds from Stevenson to Doug's, and 17-20mph at the Hatch, marking the last day of west wind before a heat wave.",
                   "zones": [
                         {
                               "zone": "Stevenson",
@@ -1451,6 +1464,10 @@ function render(data) {
           </div>
         </div>
         ${s.credibility ? `<div class="credibility">${s.credibility}</div>` : ''}
+        <div class="ai-summary">
+          <span class="ai-tag">✨ AI summary</span>
+          <p>${s.ai_summary || 'No summary available.'}</p>
+        </div>
       </div>`;
     wrap.appendChild(card);
   });
