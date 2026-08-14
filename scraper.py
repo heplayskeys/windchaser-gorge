@@ -49,7 +49,7 @@ ZONE_ORDER = [
     "coast", "astoria", "rooster rock", "corridor", "cascade locks", "stevenson", "wyeth",
     "viento", "hood river", "the hatch", "hatch", "hatchery", "mosier",
     "rowena", "the dalles", "doug's", "dougs", "lyle", "the wall", "wall",
-    "swell", "celilo", "rufus", "arlington", "roosevelt", "pasco", "desert",
+    "swell city", "swell", "celilo", "rufus", "arlington", "roosevelt", "pasco", "desert",
 ]
 
 # Multi-letter acronyms/abbreviations to keep uppercase after normalizing.
@@ -544,7 +544,7 @@ def summarize_forecast(text: str, max_sentences: int = 3) -> str:
     return " ".join(kept) if kept else text  # fall back to raw text rather than showing nothing
 
 
-
+def clean(text: str) -> str:
     text = re.sub(r"\s+", " ", text).strip()
     return text.replace("…", "...")
 
@@ -613,7 +613,7 @@ WINDTABLE_LABEL_ALIASES = {
     "rooster rock": "Rooster Rock", "iwash": "Rooster Rock",
     "stevenson": "Stevenson",
     "viento": "Viento",
-    "swell-hood river": "Hood River", "hood river": "Hood River",
+    "swell-hood river": "Swell City", "hood river": "Hood River",
     "lyle-doug's": "Lyle", "lyle": "Lyle", "doug's": "Lyle",
     "rufus": "Rufus",
     "roosevelt": "Roosevelt", "arlington": "Arlington",

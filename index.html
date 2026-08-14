@@ -1131,7 +1131,7 @@ function render(data) {
 
   const updated = new Date(data.generated_at);
   document.getElementById('updated').textContent =
-    'Last scraped ' + updated.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    'Last scraped ' + updated.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles', timeZoneName: 'short' });
 
   const wrap = document.getElementById('sources');
   wrap.innerHTML = '';
