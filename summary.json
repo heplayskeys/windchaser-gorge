@@ -1,41 +1,29 @@
 {
-  "generated_at": "2026-08-14T16:23:44.239001+00:00",
+  "generated_at": "2026-08-14T17:58:25.716015+00:00",
   "sources": [
     {
       "source": "Victor the Inflictor",
       "url": "https://victortheinflictor.com",
       "credibility": "40+ years reading Gorge wind",
-      "ai_summary": "Light, hazy conditions today with wind topping out near 10-15mph, picking up modestly by evening near Stevenson and Viento.",
+      "ai_summary": "There is no strong wind today except for a late-day west puff reaching up to 15 mph in select areas.",
       "zones": [],
       "flags": [
         {
           "label": "Smoke / Haze",
           "level": "caution",
-          "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
+          "context": "\u2026Paypal drop your email & join the storm join the impact 6:3 smokey glass ...late west puff...good music tonight s theodore ro\u2026",
           "where": null
         }
       ],
-      "mph_mentions": [
-        {
-          "range": "10-15MPH",
-          "where": "Stevenson, Viento",
-          "context": "…N cancelling the thermal gradient ...and wind to maybe 10-15 MPH at best ...picks up late day from Stevenson / Viento t…"
-        }
-      ],
-      "time_segments": [
-        {
-          "period": "Afternoon",
-          "low": 10,
-          "high": 15
-        }
-      ],
+      "mph_mentions": [],
+      "time_segments": [],
       "zone_periods": []
     },
     {
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
-      "ai_summary": "Expect an upgrade this afternoon with 21-24mph winds from Stevenson to Doug's, and 17-20mph at the Hatch, marking the last day of west wind before a heat wave.",
+      "ai_summary": "Today brings one last day of steady west wind at 17-20mph between Viento and Hood River before a heat wave arrives.",
       "zones": [
         {
           "zone": "Stevenson",
@@ -46,11 +34,6 @@
           "zone": "Viento",
           "low": 16,
           "high": 25
-        },
-        {
-          "zone": "The Hatch",
-          "low": 17,
-          "high": 20
         },
         {
           "zone": "Lyle",
@@ -73,34 +56,27 @@
           "high": 25
         }
       ],
-      "flags": [
-        {
-          "label": "Fire Danger",
-          "level": "warning",
-          "context": "…-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
-          "where": "Lyle, Stevenson, the Hatch"
-        }
-      ],
+      "flags": [],
       "mph_mentions": [
         {
           "range": "16-19mph",
           "where": "Hood River, Viento",
-          "context": "…D off with clear sky across the region. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso…"
+          "context": "\u202630.12/30.02/30.01 With 1026mb offshore. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso\u2026"
         },
         {
           "range": "7-10mph",
           "where": "Hood River, Rowena, Stevenson, Viento",
-          "context": "…Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
-        },
-        {
-          "range": "21-24mph",
-          "where": "Lyle, Stevenson, the Hatch",
-          "context": "…Ore high pressure strengthens. this gives us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. r…"
+          "context": "\u2026Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone with light/variable w\u2026"
         },
         {
           "range": "17-20mph",
-          "where": "Lyle, Stevenson, the Hatch",
-          "context": "…Es us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con…"
+          "where": "Hood River, Viento, the Dalles",
+          "context": "\u2026Light/variable wind east of the Dalles. models suggest 17-20mph pretty much all day between Viento and Hood River with\u2026"
+        },
+        {
+          "range": "14-17mph",
+          "where": "Hood River, Viento, the Hatch",
+          "context": "\u2026Ween Viento and Hood River with a late morning lull to 14-17mph possible at the Hatch."
         }
       ],
       "time_segments": [
@@ -110,9 +86,9 @@
           "high": 19
         },
         {
-          "period": "Afternoon",
-          "low": 17,
-          "high": 24
+          "period": "Morning",
+          "low": 14,
+          "high": 20
         }
       ],
       "zone_periods": [
@@ -130,24 +106,6 @@
         },
         {
           "zone": "Stevenson",
-          "period": "Afternoon",
-          "low": 21,
-          "high": 25
-        },
-        {
-          "zone": "Lyle",
-          "period": "Afternoon",
-          "low": 21,
-          "high": 29
-        },
-        {
-          "zone": "The Hatch",
-          "period": "Afternoon",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Stevenson",
           "period": "Dawn",
           "low": 13,
           "high": 16
@@ -157,6 +115,12 @@
           "period": "Morning",
           "low": 17,
           "high": 20
+        },
+        {
+          "zone": "Stevenson",
+          "period": "Afternoon",
+          "low": 22,
+          "high": 25
         },
         {
           "zone": "Stevenson",
@@ -226,6 +190,12 @@
         },
         {
           "zone": "Lyle",
+          "period": "Afternoon",
+          "low": 26,
+          "high": 29
+        },
+        {
+          "zone": "Lyle",
           "period": "Evening",
           "low": 22,
           "high": 25
@@ -289,12 +259,6 @@
       "confirmed_by_both": true
     },
     {
-      "zone": "The Hatch",
-      "low": 17,
-      "high": 20,
-      "confirmed_by_both": false
-    },
-    {
       "zone": "Lyle",
       "low": 14,
       "high": 29,
@@ -319,81 +283,6 @@
       "confirmed_by_both": false
     }
   ],
-  "flags": [
-    {
-      "label": "Smoke / Haze",
-      "level": "caution",
-      "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
-      "where": null
-    },
-    {
-      "label": "Fire Danger",
-      "level": "warning",
-      "context": "…-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
-      "where": "Lyle, Stevenson, the Hatch"
-    }
-  ],
-  "agreement_zones": [
-    "Stevenson",
-    "Viento"
-  ],
-  "direction": "westerly",
-  "weekly_outlook": [
-    {
-      "day": "Fri",
-      "low": 7,
-      "high": 29,
-      "direction": "westerly"
-    },
-    {
-      "day": "Sat",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Sun",
-      "low": 17,
-      "high": 25,
-      "direction": null
-    },
-    {
-      "day": "Mon",
-      "low": 22,
-      "high": 25,
-      "direction": null
-    },
-    {
-      "day": "Tue",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Wed",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Thu",
-      "low": null,
-      "high": null,
-      "direction": null
-    }
-  ],
-  "time_segments": [
-    {
-      "period": "Early",
-      "low": 7,
-      "high": 19
-    },
-    {
-      "period": "Afternoon",
-      "low": 10,
-      "high": 24
-    }
-  ],
   "zone_periods": [
     {
       "zone": "Viento",
@@ -409,24 +298,6 @@
     },
     {
       "zone": "Stevenson",
-      "period": "Afternoon",
-      "low": 21,
-      "high": 25
-    },
-    {
-      "zone": "Lyle",
-      "period": "Afternoon",
-      "low": 21,
-      "high": 29
-    },
-    {
-      "zone": "The Hatch",
-      "period": "Afternoon",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Stevenson",
       "period": "Dawn",
       "low": 13,
       "high": 16
@@ -436,6 +307,12 @@
       "period": "Morning",
       "low": 17,
       "high": 20
+    },
+    {
+      "zone": "Stevenson",
+      "period": "Afternoon",
+      "low": 22,
+      "high": 25
     },
     {
       "zone": "Stevenson",
@@ -505,6 +382,12 @@
     },
     {
       "zone": "Lyle",
+      "period": "Afternoon",
+      "low": 26,
+      "high": 29
+    },
+    {
+      "zone": "Lyle",
       "period": "Evening",
       "low": 22,
       "high": 25
@@ -550,6 +433,76 @@
       "period": "Evening",
       "low": 22,
       "high": 25
+    }
+  ],
+  "time_segments": [
+    {
+      "period": "Early",
+      "low": 7,
+      "high": 19
+    },
+    {
+      "period": "Morning",
+      "low": 14,
+      "high": 20
+    }
+  ],
+  "flags": [
+    {
+      "label": "Smoke / Haze",
+      "level": "caution",
+      "context": "\u2026Paypal drop your email & join the storm join the impact 6:3 smokey glass ...late west puff...good music tonight s theodore ro\u2026",
+      "where": null
+    }
+  ],
+  "agreement_zones": [
+    "Hood River",
+    "Stevenson",
+    "Viento"
+  ],
+  "direction": "westerly",
+  "weekly_outlook": [
+    {
+      "day": "Fri",
+      "low": 7,
+      "high": 29,
+      "direction": "westerly"
+    },
+    {
+      "day": "Sat",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Sun",
+      "low": 17,
+      "high": 25,
+      "direction": null
+    },
+    {
+      "day": "Mon",
+      "low": 22,
+      "high": 25,
+      "direction": null
+    },
+    {
+      "day": "Tue",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Wed",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Thu",
+      "low": null,
+      "high": null,
+      "direction": null
     }
   ]
 }
