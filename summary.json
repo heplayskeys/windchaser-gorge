@@ -12,15 +12,15 @@
         {
           "label": "Smoke / Haze",
           "level": "caution",
-          "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
-          "where": null
+          "context": "Today 7 AM pic Lyle hazy skies strong wind is done until the weekend as gradients ha\u2026",
+          "where": "Lyle"
         }
       ],
       "mph_mentions": [
         {
           "range": "10-15MPH",
-          "where": "Stevenson, Viento",
-          "context": "…N cancelling the thermal gradient ...and wind to maybe 10-15 MPH at best ...picks up late day from Stevenson / Viento t…"
+          "where": "Stevenson",
+          "context": "\u2026N cancelling the thermal gradient ...and wind to maybe 10-15 MPH... at best ...picks up late day from Stevenson / vient\u2026"
         }
       ],
       "time_segments": [
