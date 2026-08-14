@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0A1420">
+<title>Gorge Wind — Today's Conditions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A1420;
+    --panel: #11212E;
+    --panel-raised: #16293A;
+    --panel-line: #23404F;
+    --yellow: #FFC93C;
+    --yellow-ink: #241B02;
+    --green: #4CC38A;
+    --green-ink: #062015;
+    --red: #FF6B52;
+    --red-ink: #2B0A04;
+
+    --text-hi: #F7F4EA;
+    --text-mid: #C7D6DC;
+    --text-low: #93A8B1;
+
+    --band-calm: #6E8891;
+    --band-light: #E3CE63;
+    --band-good: #FFC93C;
+    --band-strong: #F0973A;
+    --band-advisory: #FF6B52;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; background: var(--bg); height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-hi);
+    font-family: 'Inter', sans-serif;
+    min-height: 100dvh;
+    min-height: 100vh; /* fallback for browsers without dvh */
+    padding-bottom: calc(3rem + env(safe-area-inset-bottom));
+  }
+
+  a { color: var(--yellow); }
+
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-left: max(1.15rem, env(safe-area-inset-left));
+    padding-right: max(1.15rem, env(safe-area-inset-right));
+  }
+
+  header { padding-top: max(1.5rem, env(safe-area-inset-top)); }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.13em; color: var(--text-low); text-transform: uppercase; }
+  h1 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 9vw, 2.6rem);
+    line-height: 0.95;
+    margin-top: 0.3rem;
+    text-transform: uppercase;
+  }
+  h1 span { color: var(--yellow); }
+  #updated { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; color: var(--text-low); margin-top: 0.4rem; }
+
+  /* ---------- Segmented-control nav: fits all items, never scrolls ---------- */
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    padding: 0.9rem 0;
+    margin-top: 1.2rem;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .segmented { display: flex; gap: 3px; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 4px; }
+  .segmented a {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+    padding: 0.55rem 0.1rem;
+    border-radius: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.01em;
+    color: var(--text-mid);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .segmented a.active { background: var(--yellow); color: var(--yellow-ink); font-weight: 700; }
+
+  section { scroll-margin-top: 5rem; }
+
+  /* ---------- Badges ---------- */
+  .badges { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0.9rem 0 0; }
+  .badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.65rem; border-radius: 5px; }
+  .badge.caution { background: var(--yellow); color: var(--yellow-ink); }
+  .badge.warning { background: var(--red); color: var(--red-ink); }
+  .badge.good { background: var(--green); color: var(--green-ink); }
+  .badge.neutral { background: var(--panel-raised); color: var(--text-mid); border: 1px solid var(--panel-line); font-weight: 500; }
+
+  /* ---------- Agreement callout ---------- */
+  .agreement {
+    margin-top: 1.1rem;
+    background: var(--panel-raised);
+    border: 1px solid var(--yellow);
+    border-radius: 8px;
+    padding: 0.75rem 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .agreement .icon { font-size: 1.1rem; }
+  .agreement .txt { font-size: 0.85rem; color: var(--text-hi); }
+  .agreement .txt b { color: var(--yellow); }
+
+  /* ---------- Gauge + glance ---------- */
+  .glance { display: flex; align-items: center; gap: 1.5rem; padding: 1.4rem 0 0.4rem; flex-wrap: wrap; }
+  .gauge { flex: 0 0 auto; width: 120px; height: 120px; }
+  .gauge-readout { flex: 1 1 200px; }
+  .gauge-readout .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(2.2rem, 10vw, 2.9rem); color: var(--yellow); line-height: 1; }
+  .gauge-readout .range span { font-size: 0.4em; color: var(--text-mid); font-family: 'IBM Plex Mono', monospace; font-weight: 500; margin-left: 0.3rem; }
+  .gauge-readout .call { margin-top: 0.5rem; font-size: 0.98rem; color: var(--text-mid); line-height: 1.5; }
+  .gauge-readout .call strong { color: var(--text-hi); font-weight: 700; }
+  .gauge-readout .call .pineapple { font-size: 1.6em; line-height: 1; display: inline-block; vertical-align: middle; transform: translateY(2px); }
+  .gauge-readout .call .sub-note { display: block; margin-top: 0.2rem; font-size: 0.85em; color: var(--text-low); }
+  .tickmark { stroke: var(--panel-line); stroke-width: 2; }
+  .tickmark.major { stroke: var(--text-low); }
+  .dial-ring { fill: none; stroke: rgba(255,255,255,0.16); stroke-width: 8; stroke-linecap: butt; }
+
+  /* ---------- Panels ---------- */
+  .panel { margin-top: 1.4rem; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; padding: 1.15rem 1.2rem 1.3rem; }
+  .panel h2 { font-family: 'Big Shoulders Display', sans-serif; font-size: 1.05rem; text-transform: uppercase; color: var(--text-hi); margin-bottom: 0.15rem; }
+  .panel-heading-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .period-hours { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); white-space: nowrap; }
+  .panel .sub { font-size: 0.78rem; color: var(--text-mid); margin-bottom: 1rem; }
+
+  .zone-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
+  .zone-row-empty { opacity: 0.45; }
+  .zone-row-empty .zone-value, .zone-row-empty .zone-kite { color: var(--text-low); }
+  .zone-row:last-child { margin-bottom: 0; }
+  .zone-label { flex: 0 0 88px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-mid); text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; }
+  .zone-label .check { color: var(--yellow); font-weight: 700; }
+  .zone-track { flex: 1; position: relative; height: 14px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .zone-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 4px; }
+  .zone-fill.confirmed { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.55); }
+  .zone-value { flex: 0 0 52px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-mid); }
+  .zone-kite { flex: 0 0 54px; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); text-align: right; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.55rem 0.9rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); }
+  .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+  .swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .zone-caption-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-bottom: 0.6rem; }
+  .zone-caption-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); }
+  .zone-caption-icon { color: var(--text-low); flex: 0 0 auto; }
+  .period-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+  .period-buttons button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-mid);
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    min-height: 32px;
+    cursor: pointer;
+  }
+  .period-buttons button.active { background: var(--yellow); color: var(--yellow-ink); border-color: var(--yellow); }
+  .zone-tally { position: absolute; top: 0; bottom: 0; display: flex; gap: 1px; }
+  .zone-tally span { flex: 1; }
+  .zone-toggle-all { text-align: center; margin-top: 0.9rem; }
+  .zone-toggle-all button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    color: var(--text-mid);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    min-height: 36px;
+  }
+  .zone-toggle-all button:hover { color: var(--text-hi); border-color: var(--text-low); }
+  .zone-kite-header { flex: 0 0 54px; text-align: right; line-height: 1; color: var(--text-mid); display: flex; justify-content: flex-end; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
+  .skull-swatch { width: auto; height: auto; font-size: 0.75rem; line-height: 1; background: none !important; }
+
+  .outlook-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 340px; margin: 0 auto; }
+  .outlook-day {
+    flex: 0 0 76px;
+    min-height: 108px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 9px;
+    padding: 0.7rem 0.35rem;
+    text-align: center;
+  }
+  .outlook-day .dname { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); margin-bottom: 0.35rem; }
+  .outlook-day .arrow-wrap { display: flex; align-items: center; justify-content: center; gap: 0.2rem; margin-bottom: 0.35rem; }
+  .outlook-day .arrow-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; }
+  .outlook-day .dir-letter { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 700; }
+  .outlook-day .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 0.98rem; line-height: 1; }
+  .outlook-day .kite { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text-low); margin-top: 0.3rem; line-height: 1.3; }
+
+  /* ---------- Tappable pills as auto-dismissing tooltips (JS-controlled, not native <details>) ---------- */
+  .chip-pop { position: relative; display: inline-block; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    min-height: 30px;
+    border: none;
+    cursor: pointer;
+  }
+  .pill.flag-pill {
+    background: transparent;
+    border: 1.5px dashed var(--panel-line);
+    font-weight: 500;
+    color: var(--text-mid);
+  }
+  .pill.flag-pill.caution { border-color: var(--yellow); color: var(--yellow); }
+  .pill.flag-pill.warning { border-color: var(--red); color: var(--red); }
+  .chip-pop-body {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.74rem;
+    font-weight: 500;
+    color: var(--text-hi);
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 6px;
+    padding: 0.5rem 0.7rem;
+    width: max-content;
+    max-width: 200px;
+    white-space: normal;
+    text-align: left;
+    line-height: 1.6;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    z-index: 30;
+  }
+  .chip-pop-body[hidden] { display: none; }
+  .chip-pop-body::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--panel-line);
+  }
+
+  .live-current { display: flex; gap: 1.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .live-stat .num { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.7rem; color: var(--text-hi); line-height: 1; }
+  .live-stat .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.2rem; }
+  svg.sparkline { width: 100%; height: 64px; display: block; }
+  .spark-caption { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.5rem; display: flex; justify-content: space-between; }
+
+  /* ---------- Source accordion cards ---------- */
+  .sources { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
+  .card { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; cursor: pointer; }
+  .card-content { padding: 1.05rem 1.15rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+  .source-name { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; }
+  .card.green-edge .source-name { color: var(--green); }
+  .card.yellow-edge .source-name { color: var(--yellow); }
+  .credibility { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); }
+  .headline { font-size: 0.94rem; color: var(--text-mid); }
+  .copy-btn {
+    flex: 0 0 auto;
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    color: var(--text-mid);
+    border-radius: 7px;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .copy-btn:hover { color: var(--text-hi); border-color: var(--text-low); }
+  .copy-btn.copied { background: var(--green); border-color: var(--green); color: var(--green-ink); }
+  .toggle-hint-text {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--yellow);
+    margin-top: 0.15rem;
+  }
+  .toggle-hint-text .arrow { transition: transform 0.2s ease; display: inline-block; }
+  .card.open .toggle-hint-text .arrow { transform: rotate(90deg); }
+  .card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+  .card.open .card-body { max-height: 900px; }
+  .card-body-inner { padding: 0 1.15rem 1.15rem; }
+  .forecast-text { font-size: 0.93rem; line-height: 1.6; color: var(--text-mid); }
+  .badges.inline { padding-top: 0.8rem; }
+  .source-link { display: inline-block; margin-top: 0.9rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-decoration: none; color: var(--text-low); border-bottom: 1px dotted var(--text-low); min-height: 30px; }
+  .source-link:hover { color: var(--text-hi); border-color: var(--text-hi); }
+
+  footer { padding: 1.8rem 0 0; font-size: 0.78rem; color: var(--text-low); line-height: 1.6; }
+  footer a { color: var(--text-low); text-decoration: underline; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card { animation: rise 0.4s ease both; }
+    .card:nth-child(2) { animation-delay: 0.06s; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Columbia River Gorge · Kite &amp; Wind Conditions</div>
+  <h1>Today's <span>Wind</span></h1>
+  <div id="updated">Loading latest readings…</div>
+</header>
+</div>
+
+<div class="navbar wrap">
+  <div class="segmented">
+    <a href="#glance" class="active">Glance</a>
+    <a href="#zones">Zones</a>
+    <a href="#outlook">Outlook</a>
+    <a href="#sources">Sources</a>
+    <a href="#live">Live</a>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="badges" id="badgesWrap"></div>
+  <div id="agreementWrap"></div>
+
+  <section id="glance" class="glance">
+    <svg class="gauge" viewBox="-8 -8 136 136" id="gaugeSvg">
+      <defs id="gaugeDefs"></defs>
+      <path id="gaugeBgArc" class="dial-ring" fill="none" stroke-linecap="butt"></path>
+      <path id="gaugeArc" fill="none" stroke-linecap="butt"></path>
+    </svg>
+    <div class="gauge-readout">
+      <div class="range" id="rangeReadout">— <span>KN · WESTERLY</span></div>
+      <div class="call" id="callText">Reading today's forecasts…</div>
+    </div>
+  </section>
+
+  <section id="zones" class="panel">
+    <div class="panel-heading-row">
+      <h2>Wind by Zone</h2>
+      <span class="period-hours" id="periodHours"></span>
+    </div>
+    <div class="sub" id="zonesSub">Today's wind — WESTERLY</div>
+    <div class="period-buttons" id="periodButtons"></div>
+    <div class="zone-caption-row">
+      <span class="zone-caption-label">Kite size</span>
+      <svg viewBox="0 0 100 100" width="14" height="14" class="zone-caption-icon" title="Recommended kite size">
+        <path d="M2,60 A48,48 0 0 1 98,60 L82,60 A32,32 0 0 0 18,60 Z" fill="currentColor"/>
+        <path d="M6,58 L48,92 M94,58 L52,92" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="94" rx="7" ry="8" fill="currentColor"/>
+      </svg>
+    </div>
+    <div id="zoneRows"></div>
+    <div class="legend" id="windLegend"></div>
+  </section>
+
+  <section id="outlook" class="panel">
+    <h2>7-Day Outlook</h2>
+    <div class="sub">From Temira's longer-term forecast · arrows show wind direction</div>
+    <div id="outlookRow" class="outlook-row"></div>
+  </section>
+
+  <section id="sources" class="sources"></section>
+
+  <section id="live" class="panel">
+    <h2>Live Model Data</h2>
+    <div class="sub" id="liveSub">Hood River, OR · Open-Meteo forecast model</div>
+    <div class="live-current" id="liveCurrent"></div>
+    <svg class="sparkline" id="sparkline" viewBox="0 0 300 64" preserveAspectRatio="none"></svg>
+    <div class="spark-caption"><span>Now</span><span id="sparkEnd">+12h</span></div>
+  </section>
+
+  <footer>
+    Human forecasts scraped once daily and normalized for readability — no
+    AI summarization. Live model data comes from the free, no-key
+    Open-Meteo API and updates on page load; it's a computer model, not a
+    replacement for Temira's or Victor's local knowledge. Always check the
+    full source before committing to a session, especially around
+    advisories.
+  </footer>
+</div>
+
+<script>
+const KN_PER_MPH = 0.868976;
+function mphToKn(mph) { return Math.round(mph * KN_PER_MPH); }
+
+const PREFERRED_KN = 30; // your friend's favorite riding speed
+
+// Single source of truth for wind speed -> color/label/kite size, used
+// consistently by the gauge, zone chart, weekly outlook, and chips.
+// All thresholds are in KNOTS. Kite sizes are tuned to a specific known
+// rider: ~140lb, riding a directional surfboard (not twin-tip) — adjust
+// for your own weight, board, and quiver.
+const WIND_BANDS = [
+  { max: 10, color: '#8ED0F0', ink: '#062033', label: 'Light',       kite: '14m+' },
+  { max: 15, color: '#3E8FD0', ink: '#F5FBFF', label: 'Breezy',      kite: '12–14m' },
+  { max: 20, color: '#4FBE7D', ink: '#062015', label: 'Good',        kite: '10–12m' },
+  { max: 25, color: '#FFC93C', ink: '#241B02', label: 'Strong',      kite: '8–10m' },
+  { max: 30, color: '#F0973A', ink: '#2B1400', label: 'Very Strong', kite: '6–8m' },
+  { max: 40, color: '#E8433A', ink: '#FFF3F0', label: 'Extreme',     kite: '4–6m' },
+  { max: 45, color: '#F45FC0', ink: '#2B0620', label: 'Severe',      kite: '3–4m' },
+  { max: Infinity, color: '#000000', ink: '#FF6FCF', label: 'Danger', kite: '💀', skull: true },
+];
+function windBand(mph) { return WIND_BANDS.find(b => mph <= b.max) || WIND_BANDS[WIND_BANDS.length - 1]; }
+function kiteSizeForMph(mph) { return windBand(mph).kite; }
+
+// Arrow rotation = direction the wind is blowing TOWARD (not from), which is
+// the more intuitive read for "which way will I be riding" — 0deg = up/north.
+const TOWARD_DEG = { westerly: 90, easterly: 270, northerly: 180, southerly: 0 };
+const TOWARD_LETTER = { westerly: 'E', easterly: 'W', northerly: 'S', southerly: 'N' };
+function directionArrowDeg(dir) { return TOWARD_DEG[dir] ?? 90; }
+function directionLetter(dir) { return TOWARD_LETTER[dir] || 'E'; }
+function directionLabel(dir) { return dir ? dir.charAt(0).toUpperCase() + dir.slice(1) : 'Westerly'; }
+
+const FLAG_ICONS = {
+  'Fire Danger': '🔥',
+  'Smoke / Haze': '🌫️',
+  'Small Craft Advisory': '⛵',
+  'Heat Advisory': '🥵',
+  'Ice Storm': '🧊',
+  'Winter Storm': '❄️',
+  'Freeze Warning': '🥶',
+  'Air Quality Alert': '😷',
+  'Avalanche Danger': '⛰️',
+  'Flood Warning': '🌊',
+  'High Wind Warning': '💨',
+  'Wind Advisory': '🌬️',
+  'Dense Fog Advisory': '🌁',
+  'Wind Chill Advisory': '🥶',
+};
+
+function parseRangeAvg(range) {
+  const m = String(range).toLowerCase().match(/(\d{1,2})-(\d{1,2})/);
+  if (!m) return null;
+  return (parseInt(m[1]) + parseInt(m[2])) / 2;
+}
+
+function mphRangeToKn(range) {
+  const m = String(range).toLowerCase().match(/(\d{1,2})-(\d{1,2})/);
+  if (!m) return null;
+  const loKn = mphToKn(parseInt(m[1]));
+  const hiKn = mphToKn(parseInt(m[2]));
+  return { loKn, hiKn, avgKn: (loKn + hiKn) / 2, label: `${loKn}–${hiKn}kn` };
+}
+
+function titleCase(str) {
+  return str.split(' ').map(w => w.length ? w[0].toUpperCase() + w.slice(1) : w).join(' ');
+}
+
+function flagHTML(f) {
+  const icon = FLAG_ICONS[f.label] || '⚠️';
+  const whereText = f.where ? f.where.split(', ').map(titleCase).join('<br>') : 'Applies generally today';
+  return `<span class="chip-pop">
+    <button type="button" class="pill flag-pill ${f.level}">${icon} ${f.label}</button>
+    <span class="chip-pop-body" hidden>${whereText}</span>
+  </span>`;
+}
+
+// Tap opens the tooltip; it auto-dismisses after ~2.5s, or immediately if
+// tapped again. Opening one closes any other open tooltip.
+function setupTooltipDismiss(root) {
+  root.querySelectorAll('.chip-pop').forEach(cp => {
+    const btn = cp.querySelector('.pill');
+    const body = cp.querySelector('.chip-pop-body');
+    if (!btn || !body || btn.dataset.tooltipWired) return;
+    btn.dataset.tooltipWired = '1';
+    let timer = null;
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = body.hasAttribute('hidden');
+      document.querySelectorAll('.chip-pop-body').forEach(b => { if (b !== body) b.setAttribute('hidden', ''); });
+      clearTimeout(timer);
+      if (isHidden) {
+        body.removeAttribute('hidden');
+        timer = setTimeout(() => body.setAttribute('hidden', ''), 2500);
+      } else {
+        body.setAttribute('hidden', '');
+      }
+    });
+  });
+}
+
+function formatScrapedDate(iso) {
+  return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+async function copySourceToClipboard(source, generatedAt, btn) {
+  const msg = `${source.source} — scraped ${formatScrapedDate(generatedAt)}\n\n` +
+    `${source.forecast_text}\n\n` +
+    `Full source: ${source.url}`;
+  try {
+    await navigator.clipboard.writeText(msg);
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1600);
+  } catch (e) {
+    // Fallback for browsers without Clipboard API permission
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '⧉'; }, 1600);
+  }
+}
+
+
+async function loadData() {
+  try {
+    const res = await fetch('summary.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('missing summary.json');
+    return await res.json();
+  } catch (e) {
+    return {
+      "generated_at": "2026-08-13T14:00:00Z",
+      "sources": [
+            {
+                  "source": "Victor the Inflictor",
+                  "url": "https://victortheinflictor.com",
+                  "headline": "Mellow west wind today. Same tomorrow.",
+                  "forecast_text": "Hazy skies strong wind is done until the weekend as gradients have weakened overnight. Not much to get winds going today. As smokey haze returns to the gorge by afternoon cancelling the thermal gradient. And wind to maybe 10-15 MPH at best. Picks up late day from Stevenson / Viento through the corridor by evening but no further east. Looks like more of the same tomorrow. With light wind again all day and a late day puff to 15 MPH at best. Stronger west winds return through the weekend with a big day out east on tuesday.",
+                  "credibility": "40+ years reading Gorge wind",
+                  "zones": [],
+                  "flags": [
+                        {
+                              "label": "Smoke / Haze",
+                              "level": "caution",
+                              "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
+                              "where": null
+                        }
+                  ],
+                  "mph_mentions": [
+                        {
+                              "range": "10-15MPH",
+                              "where": "Stevenson, Viento",
+                              "context": "…N cancelling the thermal gradient ...and wind to maybe 10-15 MPH at best ...picks up late day from Stevenson / Viento t…"
+                        }
+                  ],
+                  "time_segments": [
+                        {
+                              "period": "Afternoon",
+                              "low": 10,
+                              "high": 15
+                        }
+                  ],
+                  "zone_periods": []
+            },
+            {
+                  "source": "The Gorge Is My Gym (Temira)",
+                  "url": "https://thegorgeismygym.com/forecast",
+                  "headline": "Breezy through Wednesday, high fire danger ahead",
+                  "forecast_text": "One last day of west wind before we tumble into a heat wave. Early wind was 6-10mph at Stevenson and the Rowena zone. In the afternoon, offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. Red flag warning as high fire danger continues.",
+                  "credibility": "Hyperlocal Gorge forecaster since 2006",
+                  "zones": [
+                        {
+                              "zone": "Stevenson",
+                              "low": 6,
+                              "high": 21
+                        },
+                        {
+                              "zone": "The Hatch",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Lyle",
+                              "low": 17,
+                              "high": 21
+                        }
+                  ],
+                  "flags": [
+                        {
+                              "label": "Fire Danger",
+                              "level": "warning",
+                              "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+                              "where": "Lyle, Stevenson, the Hatch"
+                        }
+                  ],
+                  "mph_mentions": [
+                        {
+                              "range": "6-10mph",
+                              "where": "Rowena, Stevenson",
+                              "context": "…Wind before we tumble into a heat wave. early wind was 6-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
+                        },
+                        {
+                              "range": "17-21mph",
+                              "where": "Lyle, Stevenson, the Hatch",
+                              "context": "…, Offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. r…"
+                        },
+                        {
+                              "range": "17-20mph",
+                              "where": "Lyle, Stevenson, the Hatch",
+                              "context": "…Iving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con…"
+                        }
+                  ],
+                  "time_segments": [
+                        {
+                              "period": "Early",
+                              "low": 6,
+                              "high": 10
+                        },
+                        {
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 21
+                        }
+                  ],
+                  "zone_periods": [
+                        {
+                              "zone": "Stevenson",
+                              "period": "Early",
+                              "low": 6,
+                              "high": 10
+                        },
+                        {
+                              "zone": "Stevenson",
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 21
+                        },
+                        {
+                              "zone": "Lyle",
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 21
+                        },
+                        {
+                              "zone": "The Hatch",
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 20
+                        }
+                  ]
+            }
+      ],
+      "zones": [
+            {
+                  "zone": "Stevenson",
+                  "low": 6,
+                  "high": 21,
+                  "confirmed_by_both": true
+            },
+            {
+                  "zone": "The Hatch",
+                  "low": 17,
+                  "high": 20,
+                  "confirmed_by_both": false
+            },
+            {
+                  "zone": "Lyle",
+                  "low": 17,
+                  "high": 21,
+                  "confirmed_by_both": false
+            }
+      ],
+      "flags": [
+            {
+                  "label": "Smoke / Haze",
+                  "level": "caution",
+                  "context": "Hazy skies strong wind is done until the weekend as gradients ha…",
+                  "where": null
+            },
+            {
+                  "label": "Fire Danger",
+                  "level": "warning",
+                  "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+                  "where": "Lyle, Stevenson, the Hatch"
+            }
+      ],
+      "agreement_zones": [
+            "Stevenson"
+      ],
+      "direction": "westerly",
+      "weekly_outlook": [
+            {
+                  "day": "Fri",
+                  "low": 6,
+                  "high": 21,
+                  "direction": "westerly"
+            },
+            {
+                  "day": "Sat",
+                  "low": null,
+                  "high": null,
+                  "direction": null
+            },
+            {
+                  "day": "Sun",
+                  "low": 17,
+                  "high": 25,
+                  "direction": null
+            },
+            {
+                  "day": "Mon",
+                  "low": 22,
+                  "high": 25,
+                  "direction": null
+            },
+            {
+                  "day": "Tue",
+                  "low": null,
+                  "high": null,
+                  "direction": null
+            },
+            {
+                  "day": "Wed",
+                  "low": null,
+                  "high": null,
+                  "direction": null
+            },
+            {
+                  "day": "Thu",
+                  "low": null,
+                  "high": null,
+                  "direction": null
+            }
+      ],
+      "time_segments": [
+            {
+                  "period": "Early",
+                  "low": 6,
+                  "high": 10
+            },
+            {
+                  "period": "Afternoon",
+                  "low": 10,
+                  "high": 21
+            }
+      ],
+      "zone_periods": [
+            {
+                  "zone": "Stevenson",
+                  "period": "Early",
+                  "low": 6,
+                  "high": 10
+            },
+            {
+                  "zone": "Stevenson",
+                  "period": "Afternoon",
+                  "low": 17,
+                  "high": 21
+            },
+            {
+                  "zone": "Lyle",
+                  "period": "Afternoon",
+                  "low": 17,
+                  "high": 21
+            },
+            {
+                  "zone": "The Hatch",
+                  "period": "Afternoon",
+                  "low": 17,
+                  "high": 20
+            }
+      ]
+};
+  }
+}
+
+// Live model data from Open-Meteo — free, no API key, client-side call.
+// NOTE: this won't run inside Claude's in-chat preview sandbox, which blocks
+// outbound network requests. It works fine once hosted on a real domain
+// (e.g. GitHub Pages) — Open-Meteo supports CORS for direct browser calls.
+async function loadLive() {
+  const lat = 45.7133, lon = -121.5254;
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&hourly=wind_speed_10m,wind_direction_10m&current=temperature_2m,wind_speed_10m,wind_direction_10m` +
+    `&wind_speed_unit=kn&temperature_unit=fahrenheit&timezone=auto&forecast_days=1`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('open-meteo unavailable');
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function degToCompass(deg) {
+  const dirs = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
+function renderLive(data) {
+  const currentWrap = document.getElementById('liveCurrent');
+  const spark = document.getElementById('sparkline');
+  const sub = document.getElementById('liveSub');
+
+  if (!data || !data.current) {
+    sub.textContent = 'Live model data unavailable here — this preview sandbox blocks outbound requests. Works once hosted on a real domain.';
+    currentWrap.innerHTML = '';
+    spark.innerHTML = '';
+    return;
+  }
+
+  const c = data.current;
+  currentWrap.innerHTML = `
+    <div class="live-stat"><div class="num">${Math.round(c.wind_speed_10m)}</div><div class="lbl">KN NOW</div></div>
+    <div class="live-stat"><div class="num">${degToCompass(c.wind_direction_10m)}</div><div class="lbl">DIRECTION</div></div>
+    <div class="live-stat"><div class="num">${Math.round(c.temperature_2m)}°</div><div class="lbl">TEMP F</div></div>
+  `;
+
+  const speeds = (data.hourly && data.hourly.wind_speed_10m || []).slice(0, 13);
+  if (!speeds.length) { spark.innerHTML = ''; return; }
+
+  const max = Math.max(30, ...speeds);
+  const w = 300, h = 64, step = w / (speeds.length - 1);
+  const points = speeds.map((s, i) => `${i * step},${h - (s / max) * h}`).join(' ');
+  const fillPoints = `0,${h} ` + points + ` ${w},${h}`;
+  spark.innerHTML = `
+    <polyline points="${fillPoints}" fill="rgba(255,201,60,0.12)" stroke="none"></polyline>
+    <polyline points="${points}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    ${speeds.map((s, i) => `<circle cx="${i * step}" cy="${h - (s / max) * h}" r="2.5" fill="${windBand(s).color}"></circle>`).join('')}
+  `;
+}
+
+function drawTicks(svg) {
+  const cx = 60, cy = 60, rOuter = 52, rInnerMajor = 43, rInnerMinor = 47;
+  for (let deg = -120; deg <= 120; deg += 15) {
+    const rad = (deg - 90) * Math.PI / 180;
+    const isMajor = deg % 30 === 0;
+    const rInner = isMajor ? rInnerMajor : rInnerMinor;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', cx + rOuter * Math.cos(rad));
+    line.setAttribute('y1', cy + rOuter * Math.sin(rad));
+    line.setAttribute('x2', cx + rInner * Math.cos(rad));
+    line.setAttribute('y2', cy + rInner * Math.sin(rad));
+    line.setAttribute('class', 'tickmark' + (isMajor ? ' major' : ''));
+    svg.appendChild(line);
+  }
+  // Reference numbers OUTSIDE the tick ring, next to their corresponding tick
+  [[5, -120], [25, 0], [45, 120]].forEach(([val, deg]) => {
+    const rad = (deg - 90) * Math.PI / 180;
+    const x = cx + 59 * Math.cos(rad), y = cy + 59 * Math.sin(rad);
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y + 2.5);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('font-size', '6.5');
+    t.setAttribute('font-family', "'IBM Plex Mono', monospace");
+    t.setAttribute('fill', 'var(--text-low)');
+    t.textContent = val;
+    svg.appendChild(t);
+  });
+}
+
+// Gauge dial maps 5-45kn onto a 240deg sweep (-120 to 120), so each 30deg
+// segment between major ticks is exactly 5kn — matches the dial face.
+function knToGaugeDeg(kn) {
+  const clamped = Math.min(45, Math.max(5, kn));
+  return ((clamped - 5) / 40) * 240 - 120;
+}
+function polarPoint(cx, cy, r, deg) {
+  const rad = (deg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+}
+function arcPath(cx, cy, r, startDeg, endDeg) {
+  if (endDeg < startDeg) { [startDeg, endDeg] = [endDeg, startDeg]; }
+  const [x1, y1] = polarPoint(cx, cy, r, startDeg);
+  const [x2, y2] = polarPoint(cx, cy, r, endDeg);
+  const largeArc = (endDeg - startDeg) > 180 ? 1 : 0;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+function drawGaugeRange(loKn, hiKn, colorLo, colorHi) {
+  const bg = document.getElementById('gaugeBgArc');
+  if (!bg.getAttribute('d')) bg.setAttribute('d', arcPath(60, 60, 36, -120, 120));
+  const arc = document.getElementById('gaugeArc');
+  const defs = document.getElementById('gaugeDefs');
+  if (loKn == null || hiKn == null) {
+    arc.setAttribute('d', '');
+    return;
+  }
+  let startDeg = knToGaugeDeg(loKn), endDeg = knToGaugeDeg(hiKn);
+  const MIN_SPAN_DEG = 14; // keeps a narrow range from rendering as an invisible sliver
+  if (endDeg - startDeg < MIN_SPAN_DEG) {
+    const mid = (startDeg + endDeg) / 2;
+    startDeg = Math.max(-120, mid - MIN_SPAN_DEG / 2);
+    endDeg = Math.min(120, startDeg + MIN_SPAN_DEG);
+    startDeg = endDeg - MIN_SPAN_DEG; // re-clamp in case endDeg hit the ceiling
+  }
+  arc.setAttribute('d', arcPath(60, 60, 36, startDeg, endDeg));
+  arc.setAttribute('stroke-width', '8');
+
+  // Gradient along the chord between the arc's two endpoints, so the fill
+  // reads low-color -> high-color even though the path itself curves.
+  const [x1, y1] = polarPoint(60, 60, 36, Math.min(startDeg, endDeg));
+  const [x2, y2] = polarPoint(60, 60, 36, Math.max(startDeg, endDeg));
+  defs.innerHTML = `<linearGradient id="gaugeGrad" gradientUnits="userSpaceOnUse" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+    <stop offset="0%" stop-color="${colorLo}"/>
+    <stop offset="100%" stop-color="${colorHi}"/>
+  </linearGradient>`;
+  arc.setAttribute('stroke', 'url(#gaugeGrad)');
+}
+
+function renderBadges(container, flags) {
+  container.innerHTML = (flags || []).map(flagHTML).join('');
+}
+
+function joinWithAmpersand(items) {
+  if (items.length === 1) return items[0];
+  if (items.length === 2) return `${items[0]} & ${items[1]}`;
+  return `${items.slice(0, -1).join(', ')} & ${items[items.length - 1]}`;
+}
+
+function renderAgreement(zones) {
+  const wrap = document.getElementById('agreementWrap');
+  if (!zones || !zones.length) { wrap.innerHTML = ''; return; }
+
+  const withDist = zones.map(z => {
+    const loKn = mphToKn(z.low), hiKn = mphToKn(z.high);
+    const dist = PREFERRED_KN < loKn ? loKn - PREFERRED_KN : (PREFERRED_KN > hiKn ? PREFERRED_KN - hiKn : 0);
+    return { zone: z.zone, dist };
+  });
+  const minDist = Math.min(...withDist.map(z => z.dist));
+  const closest = withDist.filter(z => z.dist === minDist).map(z => z.zone);
+  if (!closest.length) { wrap.innerHTML = ''; return; }
+
+  wrap.innerHTML = `
+    <div class="agreement">
+      <span class="icon">🎯</span>
+      <span class="txt">Today's best ${closest.length > 1 ? 'spots' : 'spot'} for ${PREFERRED_KN}kn lovers: <b>${joinWithAmpersand(closest)}</b></span>
+    </div>`;
+}
+
+function renderLegend() {
+  const el = document.getElementById('windLegend');
+  let prevMax = 0;
+  el.innerHTML = WIND_BANDS.map(b => {
+    const range = b.max === Infinity ? `${prevMax}+` : `${prevMax}–${b.max}`;
+    prevMax = b.max;
+    const swatch = b.skull ? `<i class="swatch skull-swatch">💀</i>` : `<i class="swatch" style="background:${b.color}"></i>`;
+    return `<span>${swatch}${range}kn ${b.label.toLowerCase()}</span>`;
+  }).join('');
+}
+
+function renderOutlook(days, fallbackDirection) {
+  const row = document.getElementById('outlookRow');
+  if (!days || !days.length) {
+    row.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No multi-day breakdown available today — check Temira's full forecast for the extended outlook.</div>`;
+    return;
+  }
+  row.innerHTML = days.map(d => {
+    if (d.low == null || d.high == null) {
+      return `<div class="outlook-day empty"><div class="dname">${d.day}</div><div class="none">No data</div></div>`;
+    }
+    const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
+    const dir = d.direction || fallbackDirection || 'westerly';
+    const deg = directionArrowDeg(dir);
+    const letter = directionLetter(dir);
+    const band = windBand(hiKn);
+    return `
+      <div class="outlook-day" style="background:${band.color};border-color:${band.color}">
+        <div class="dname" style="color:${band.ink}">${d.day}</div>
+        <div class="arrow-wrap">
+          <svg viewBox="0 0 24 24" style="transform:rotate(${deg}deg)">
+            <path d="M12 3 L12 21 M12 3 L6 9 M12 3 L18 9" stroke="${band.ink}" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="dir-letter" style="color:${band.ink}">${letter}</span>
+        </div>
+        <div class="range" style="color:${band.ink}">${loKn}–${hiKn}</div>
+        <div class="kite" style="color:${band.ink};opacity:0.85">${band.kite}</div>
+      </div>`;
+  }).join('');
+}
+
+
+function tallyMarkColors(loKn, hiKn) {
+  const segments = Math.max(4, Math.min(14, Math.round(hiKn - loKn) || 4));
+  const marks = [];
+  for (let i = 0; i < segments; i++) {
+    const val = loKn + (hiKn - loKn) * (segments === 1 ? 0 : i / (segments - 1));
+    marks.push(windBand(val).color);
+  }
+  return marks;
+}
+
+function renderZoneChart(rows) {
+  const rowsEl = document.getElementById('zoneRows');
+  if (!rows || !rows.length) {
+    rowsEl.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No zone-specific numbers extracted today — check the full forecasts below.</div>`;
+    return;
+  }
+
+  const dataRows = rows.filter(r => r.hasData);
+  const maxScale = dataRows.length ? Math.max(30, ...dataRows.map(r => mphToKn(r.high))) : 30;
+
+  rowsEl.innerHTML = rows.map(r => {
+    if (!r.hasData) {
+      return `
+      <div class="zone-row zone-row-empty">
+        <div class="zone-label">${r.zone}</div>
+        <div class="zone-track"></div>
+        <div class="zone-value">–</div>
+        <div class="zone-kite">–</div>
+      </div>`;
+    }
+    const loKn = mphToKn(r.low), hiKn = mphToKn(r.high);
+    const leftPct = (loKn / maxScale) * 100;
+    const widthPct = ((hiKn - loKn) / maxScale) * 100;
+    const kite = windBand(hiKn).kite;
+    const marks = tallyMarkColors(loKn, hiKn);
+    const barHTML = `<div class="zone-tally" style="left:${leftPct}%;width:${Math.max(widthPct,3)}%;">${marks.map(c => `<span style="background:${c}"></span>`).join('')}</div>`;
+    return `
+      <div class="zone-row">
+        <div class="zone-label">${r.zone}</div>
+        <div class="zone-track">${barHTML}</div>
+        <div class="zone-value">${loKn}–${hiKn}kn</div>
+        <div class="zone-kite">${kite}</div>
+      </div>`;
+  }).join('');
+}
+
+let currentData = null;
+let selectedPeriod = 'All Day';
+
+// Always builds rows from the FULL, alphabetically-sorted zone list (the
+// same set/order every time), so switching periods never changes which
+// rows exist or where they sit — only whether a row has data for that
+// period. Prevents the table from resizing/reshuffling on every click.
+function buildStableRows(data, period) {
+  const master = [...(data.zones || [])].sort((a, b) => a.zone.localeCompare(b.zone));
+  if (period === 'All Day') {
+    return master.map(z => ({ zone: z.zone, low: z.low, high: z.high, hasData: true }));
+  }
+  const periodMap = {};
+  (data.zone_periods || []).forEach(zp => { if (zp.period === period) periodMap[zp.zone] = zp; });
+  return master.map(z => {
+    const zp = periodMap[z.zone];
+    return zp ? { zone: z.zone, low: zp.low, high: zp.high, hasData: true } : { zone: z.zone, low: null, high: null, hasData: false };
+  });
+}
+
+// Approximate — these labels are just a reference, not tied to the exact
+// hour boundaries the keyword-based extraction actually used.
+const PERIOD_HOURS = {
+  'Dawn': '5–7am',
+  'Early': '7–9am',
+  'Morning': '9am–12pm',
+  'Afternoon': '12–5pm',
+  'Evening': '5–9pm',
+  'Night': '9pm–5am',
+};
+
+function updateGlanceAndZones(period) {
+  selectedPeriod = period;
+  const rows = buildStableRows(currentData, period);
+  renderZoneChart(rows);
+  document.getElementById('periodHours').textContent = PERIOD_HOURS[period] || '';
+
+  const withData = rows.filter(r => r.hasData);
+  const best = withData.length
+    ? withData.reduce((a, b) => {
+        const avgA = (mphToKn(a.low) + mphToKn(a.high)) / 2;
+        const avgB = (mphToKn(b.low) + mphToKn(b.high)) / 2;
+        return avgB > avgA ? b : a;
+      })
+    : null;
+
+  const loKn = best ? mphToKn(best.low) : null;
+  const hiKn = best ? mphToKn(best.high) : null;
+  const highBand = hiKn !== null ? windBand(hiKn) : null;
+
+  document.getElementById('rangeReadout').innerHTML =
+    (loKn !== null ? `${loKn}–${hiKn}` : '—') + ` <span>KN · ${directionLabel(currentData.direction).toUpperCase()}</span>`;
+  if (highBand) document.getElementById('rangeReadout').style.color = highBand.color;
+  document.getElementById('zonesSub').textContent = `Today's wind — ${directionLabel(currentData.direction).toUpperCase()}`;
+
+  const periodLabel = period !== 'All Day' ? `<span class="sub-note">Viewing: ${period}</span><br>` : '';
+  const bestSpotName = (hiKn !== null && hiKn < 15) ? '<span class="pineapple">🍍</span>' : (best ? best.zone : null);
+  document.getElementById('callText').innerHTML = best
+    ? `${periodLabel}<strong>Best spot:</strong> ${bestSpotName}`
+    : `<span class="sub-note">No precise zone data for this period — try All Day.</span>`;
+
+  drawGaugeRange(loKn, hiKn, loKn !== null ? windBand(loKn).color : '#000', hiKn !== null ? windBand(hiKn).color : '#000');
+}
+
+function setupPeriodPicker(data) {
+  const wrap = document.getElementById('periodButtons');
+  const periodsPresent = [...new Set((data.zone_periods || []).map(z => z.period))];
+  const order = ['Dawn', 'Early', 'Morning', 'Afternoon', 'Evening', 'Night'];
+  const ordered = order.filter(p => periodsPresent.includes(p));
+  const all = ['All Day', ...ordered];
+  wrap.innerHTML = all.map(p => `<button type="button" data-period="${p}" class="${p === 'All Day' ? 'active' : ''}">${p}</button>`).join('');
+  wrap.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      updateGlanceAndZones(btn.dataset.period);
+    });
+  });
+}
+
+function render(data) {
+  const svg = document.getElementById('gaugeSvg');
+  drawTicks(svg);
+  currentData = data;
+
+  renderBadges(document.getElementById('badgesWrap'), data.flags);
+  renderAgreement(data.zones);
+  renderLegend();
+  renderOutlook(data.weekly_outlook, data.direction);
+  setupPeriodPicker(data);
+  updateGlanceAndZones('All Day');
+
+  const updated = new Date(data.generated_at);
+  document.getElementById('updated').textContent =
+    'Last scraped ' + updated.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+  const wrap = document.getElementById('sources');
+  wrap.innerHTML = '';
+  data.sources.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.className = 'card ' + (i === 0 ? 'green-edge' : 'yellow-edge');
+    if (s.error) {
+      card.innerHTML = `<div class="card-content"><div class="card-top"><div class="source-name">${s.source}</div></div>
+        <div class="headline">Couldn't load this source today. Check it directly.</div></div>`;
+      wrap.appendChild(card);
+      return;
+    }
+    card.innerHTML = `
+      <div class="card-content">
+        <div class="card-top">
+          <div class="source-name">${s.source}</div>
+          <button class="copy-btn" type="button" title="Copy to share" aria-label="Copy forecast to clipboard">⧉</button>
+        </div>
+        ${s.credibility ? `<div class="credibility">${s.credibility}</div>` : ''}
+        <div class="headline">${s.headline || ''}</div>
+        <div class="toggle-hint-text"><span class="arrow">▸</span> View full forecast</div>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <div class="forecast-text">${s.forecast_text}</div>
+          <div class="badges inline">${(s.flags||[]).map(flagHTML).join('')}</div>
+          <a class="source-link" href="${s.url}" target="_blank" rel="noopener">Open original source →</a>
+        </div>
+      </div>`;
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.copy-btn') || e.target.closest('a')) return;
+      card.classList.toggle('open');
+    });
+    card.querySelector('.copy-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      copySourceToClipboard(s, data.generated_at, e.currentTarget);
+    });
+    wrap.appendChild(card);
+  });
+  setupTooltipDismiss(document);
+}
+
+function setupNavHighlight() {
+  const links = document.querySelectorAll('.segmented a');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+  window.addEventListener('scroll', () => {
+    let idx = 0;
+    sections.forEach((sec, i) => { if (sec && window.scrollY >= sec.offsetTop - 90) idx = i; });
+    links.forEach((l, i) => l.classList.toggle('active', i === idx));
+  });
+}
+
+loadData().then(data => { render(data); setupNavHighlight(); });
+loadLive().then(renderLive);
+</script>
+
+</body>
+</html>
