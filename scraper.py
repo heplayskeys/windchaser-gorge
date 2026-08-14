@@ -588,17 +588,10 @@ def scrape_victor():
             unique.append(c)
 
     raw_text = unique[0] if unique else ""
-    normalized = normalize_case(raw_text) if raw_text else "Forecast text not found — site layout may have changed."
-    # Headline: use the real forecast's own first sentence rather than the
-    # static <title> tag (which is just his site name every day, not
-    # today's actual headline, and isn't reliably locatable in the DOM).
-    headline = normalized.split(".")[0].strip() if raw_text else ""
 
     return {
         "source": "Victor the Inflictor",
         "url": VTI_URL,
-        "headline": headline,
-        "forecast_text": summarize_forecast(normalized) if raw_text else normalized,
         "credibility": CREDIBILITY["Victor the Inflictor"],
         "zones": extract_zones(raw_text),
         "flags": extract_flags(raw_text),
@@ -794,17 +787,6 @@ def scrape_gorge_gym():
                     outlook_paragraphs.append(text)
     outlook_text = " ".join(outlook_paragraphs)
 
-    # Headline: the actual post title. Her theme uses <h1> for BOTH the
-    # site logo ("The Gorge Is My Gym") and the real post title, so we
-    # skip any short h1 that's just the site name and take the first
-    # substantial one.
-    headline_raw = ""
-    for h in soup.find_all("h1"):
-        txt = clean(h.get_text(" "))
-        if len(txt) > 20 and "the gorge is my gym" not in txt.lower():
-            headline_raw = txt
-            break
-
     prose_zones = extract_zones(raw_text)
     prose_zone_periods = extract_zone_periods(raw_text)
 
@@ -827,8 +809,6 @@ def scrape_gorge_gym():
     return {
         "source": "The Gorge Is My Gym (Temira)",
         "url": GORGE_GYM_URL,
-        "headline": headline_raw,
-        "forecast_text": summarize_forecast(raw_text) if raw_text else "Forecast text not found — site layout may have changed.",
         "credibility": CREDIBILITY["The Gorge Is My Gym (Temira)"],
         "zones": combined_zones,
         "flags": extract_flags(raw_text),

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0A1420">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <title>Gorge Wind — Today's Conditions</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -273,49 +274,27 @@
   svg.sparkline { width: 100%; height: 64px; display: block; }
   .spark-caption { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.5rem; display: flex; justify-content: space-between; }
 
-  /* ---------- Source accordion cards ---------- */
+  /* ---------- Source cards — each one is a plain link to the original site ---------- */
   .sources { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
-  .card { background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; }
+  .card {
+    display: block;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    min-height: 44px;
+    transition: border-color 0.15s ease;
+  }
+  .card:hover { border-color: var(--text-low); }
   .card-content { padding: 1.05rem 1.15rem; display: flex; flex-direction: column; gap: 0.35rem; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
-  .source-name { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; }
+  .source-name { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem; }
   .card.green-edge .source-name { color: var(--green); }
   .card.yellow-edge .source-name { color: var(--yellow); }
+  .ext-link-icon { flex: 0 0 auto; opacity: 0.85; }
   .credibility { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); }
   .headline { font-size: 0.94rem; color: var(--text-mid); }
-  .copy-btn {
-    flex: 0 0 auto;
-    background: var(--panel-raised);
-    border: 1px solid var(--panel-line);
-    color: var(--text-mid);
-    border-radius: 7px;
-    width: 34px; height: 34px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 0.95rem;
-  }
-  .copy-btn:hover { color: var(--text-hi); border-color: var(--text-low); }
-  .copy-btn.copied { background: var(--green); border-color: var(--green); color: var(--green-ink); }
-  .forecast-text { font-size: 0.93rem; line-height: 1.6; color: var(--text-mid); margin-top: 0.3rem; }
-  .badges.inline { padding-top: 0.7rem; }
-  .source-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    width: 100%;
-    margin-top: 1rem;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.82rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--yellow-ink);
-    background: var(--yellow);
-    border-radius: 8px;
-    padding: 0.6rem 0.8rem;
-    min-height: 40px;
-  }
-  .source-link:hover { filter: brightness(1.08); }
 
   footer { padding: 1.8rem 0 0; font-size: 0.78rem; color: var(--text-low); line-height: 1.6; }
   footer a { color: var(--text-low); text-decoration: underline; }
@@ -399,8 +378,7 @@
   <section id="sources" class="sources"></section>
 
   <footer>
-    Human forecasts scraped once daily and normalized for readability — no
-    AI summarization. Live model data comes from the free, no-key
+    Human forecasts scraped once daily. Live model data comes from the
     Open-Meteo API and updates on page load; it's a computer model, not a
     replacement for Temira's or Victor's local knowledge. Always check the
     full source before committing to a session, especially around
@@ -513,8 +491,11 @@ function formatScrapedDate(iso) {
 }
 
 async function copySourceToClipboard(source, generatedAt, btn) {
+  const zoneLines = (source.zones || [])
+    .map(z => `${z.zone}: ${mphToKn(z.low)}–${mphToKn(z.high)}kn`)
+    .join('\n');
   const msg = `${source.source} — scraped ${formatScrapedDate(generatedAt)}\n\n` +
-    `${source.forecast_text}\n\n` +
+    (zoneLines || 'No zone-specific data today.') + `\n\n` +
     `Full source: ${source.url}`;
   try {
     await navigator.clipboard.writeText(msg);
@@ -543,13 +524,11 @@ async function loadData() {
     return await res.json();
   } catch (e) {
     return {
-      "generated_at": "2026-08-13T14:00:00Z",
+      "generated_at": "2026-08-14T06:50:43.237806+00:00",
       "sources": [
             {
                   "source": "Victor the Inflictor",
                   "url": "https://victortheinflictor.com",
-                  "headline": "Mellow west wind today. Same tomorrow.",
-                  "forecast_text": "Hazy skies strong wind is done until the weekend as gradients have weakened overnight. Not much to get winds going today. As smokey haze returns to the gorge by afternoon cancelling the thermal gradient. And wind to maybe 10-15 MPH at best. Picks up late day from Stevenson / Viento through the corridor by evening but no further east. Looks like more of the same tomorrow. With light wind again all day and a late day puff to 15 MPH at best. Stronger west winds return through the weekend with a big day out east on tuesday.",
                   "credibility": "40+ years reading Gorge wind",
                   "zones": [],
                   "flags": [
@@ -579,14 +558,17 @@ async function loadData() {
             {
                   "source": "The Gorge Is My Gym (Temira)",
                   "url": "https://thegorgeismygym.com/forecast",
-                  "headline": "Breezy through Wednesday, high fire danger ahead",
-                  "forecast_text": "One last day of west wind before we tumble into a heat wave. Early wind was 6-10mph at Stevenson and the Rowena zone. In the afternoon, offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. Red flag warning as high fire danger continues.",
                   "credibility": "Hyperlocal Gorge forecaster since 2006",
                   "zones": [
                         {
                               "zone": "Stevenson",
-                              "low": 6,
-                              "high": 21
+                              "low": 7,
+                              "high": 25
+                        },
+                        {
+                              "zone": "Viento",
+                              "low": 16,
+                              "high": 25
                         },
                         {
                               "zone": "The Hatch",
@@ -595,71 +577,223 @@ async function loadData() {
                         },
                         {
                               "zone": "Lyle",
+                              "low": 14,
+                              "high": 29
+                        },
+                        {
+                              "zone": "Swell City",
                               "low": 17,
-                              "high": 21
+                              "high": 25
+                        },
+                        {
+                              "zone": "Rufus",
+                              "low": 10,
+                              "high": 29
+                        },
+                        {
+                              "zone": "Roosevelt",
+                              "low": 10,
+                              "high": 25
                         }
                   ],
                   "flags": [
                         {
                               "label": "Fire Danger",
                               "level": "warning",
-                              "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+                              "context": "…-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
                               "where": "Lyle, Stevenson, the Hatch"
                         }
                   ],
                   "mph_mentions": [
                         {
-                              "range": "6-10mph",
-                              "where": "Rowena, Stevenson",
-                              "context": "…Wind before we tumble into a heat wave. early wind was 6-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
+                              "range": "16-19mph",
+                              "where": "Hood River, Viento",
+                              "context": "…D off with clear sky across the region. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso…"
                         },
                         {
-                              "range": "17-21mph",
+                              "range": "7-10mph",
+                              "where": "Hood River, Rowena, Stevenson, Viento",
+                              "context": "…Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone. in the afternoon, of…"
+                        },
+                        {
+                              "range": "21-24mph",
                               "where": "Lyle, Stevenson, the Hatch",
-                              "context": "…, Offshore high pressure strengthens, giving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. r…"
+                              "context": "…Ore high pressure strengthens. this gives us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. r…"
                         },
                         {
                               "range": "17-20mph",
                               "where": "Lyle, Stevenson, the Hatch",
-                              "context": "…Iving a shot at 17-21mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con…"
+                              "context": "…Es us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con…"
                         }
                   ],
                   "time_segments": [
                         {
                               "period": "Early",
-                              "low": 6,
-                              "high": 10
+                              "low": 7,
+                              "high": 19
                         },
                         {
                               "period": "Afternoon",
                               "low": 17,
-                              "high": 21
+                              "high": 24
                         }
                   ],
                   "zone_periods": [
                         {
+                              "zone": "Viento",
+                              "period": "Early",
+                              "low": 16,
+                              "high": 19
+                        },
+                        {
                               "zone": "Stevenson",
                               "period": "Early",
-                              "low": 6,
+                              "low": 7,
                               "high": 10
                         },
                         {
                               "zone": "Stevenson",
                               "period": "Afternoon",
-                              "low": 17,
-                              "high": 21
+                              "low": 21,
+                              "high": 25
                         },
                         {
                               "zone": "Lyle",
                               "period": "Afternoon",
-                              "low": 17,
-                              "high": 21
+                              "low": 21,
+                              "high": 29
                         },
                         {
                               "zone": "The Hatch",
                               "period": "Afternoon",
                               "low": 17,
                               "high": 20
+                        },
+                        {
+                              "zone": "Stevenson",
+                              "period": "Dawn",
+                              "low": 13,
+                              "high": 16
+                        },
+                        {
+                              "zone": "Stevenson",
+                              "period": "Morning",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Stevenson",
+                              "period": "Evening",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Viento",
+                              "period": "Dawn",
+                              "low": 20,
+                              "high": 23
+                        },
+                        {
+                              "zone": "Viento",
+                              "period": "Morning",
+                              "low": 22,
+                              "high": 25
+                        },
+                        {
+                              "zone": "Viento",
+                              "period": "Afternoon",
+                              "low": 20,
+                              "high": 23
+                        },
+                        {
+                              "zone": "Viento",
+                              "period": "Evening",
+                              "low": 22,
+                              "high": 25
+                        },
+                        {
+                              "zone": "Swell City",
+                              "period": "Dawn",
+                              "low": 20,
+                              "high": 23
+                        },
+                        {
+                              "zone": "Swell City",
+                              "period": "Morning",
+                              "low": 22,
+                              "high": 25
+                        },
+                        {
+                              "zone": "Swell City",
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Swell City",
+                              "period": "Evening",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Lyle",
+                              "period": "Dawn",
+                              "low": 14,
+                              "high": 17
+                        },
+                        {
+                              "zone": "Lyle",
+                              "period": "Morning",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Lyle",
+                              "period": "Evening",
+                              "low": 22,
+                              "high": 25
+                        },
+                        {
+                              "zone": "Rufus",
+                              "period": "Dawn",
+                              "low": 10,
+                              "high": 13
+                        },
+                        {
+                              "zone": "Rufus",
+                              "period": "Afternoon",
+                              "low": 26,
+                              "high": 29
+                        },
+                        {
+                              "zone": "Rufus",
+                              "period": "Evening",
+                              "low": 26,
+                              "high": 29
+                        },
+                        {
+                              "zone": "Roosevelt",
+                              "period": "Dawn",
+                              "low": 10,
+                              "high": 13
+                        },
+                        {
+                              "zone": "Roosevelt",
+                              "period": "Morning",
+                              "low": 13,
+                              "high": 16
+                        },
+                        {
+                              "zone": "Roosevelt",
+                              "period": "Afternoon",
+                              "low": 17,
+                              "high": 20
+                        },
+                        {
+                              "zone": "Roosevelt",
+                              "period": "Evening",
+                              "low": 22,
+                              "high": 25
                         }
                   ]
             }
@@ -667,8 +801,14 @@ async function loadData() {
       "zones": [
             {
                   "zone": "Stevenson",
-                  "low": 6,
-                  "high": 21,
+                  "low": 7,
+                  "high": 25,
+                  "confirmed_by_both": true
+            },
+            {
+                  "zone": "Viento",
+                  "low": 16,
+                  "high": 25,
                   "confirmed_by_both": true
             },
             {
@@ -679,8 +819,26 @@ async function loadData() {
             },
             {
                   "zone": "Lyle",
+                  "low": 14,
+                  "high": 29,
+                  "confirmed_by_both": false
+            },
+            {
+                  "zone": "Swell City",
                   "low": 17,
-                  "high": 21,
+                  "high": 25,
+                  "confirmed_by_both": false
+            },
+            {
+                  "zone": "Rufus",
+                  "low": 10,
+                  "high": 29,
+                  "confirmed_by_both": false
+            },
+            {
+                  "zone": "Roosevelt",
+                  "low": 10,
+                  "high": 25,
                   "confirmed_by_both": false
             }
       ],
@@ -694,19 +852,20 @@ async function loadData() {
             {
                   "label": "Fire Danger",
                   "level": "warning",
-                  "context": "…-21mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+                  "context": "…-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
                   "where": "Lyle, Stevenson, the Hatch"
             }
       ],
       "agreement_zones": [
-            "Stevenson"
+            "Stevenson",
+            "Viento"
       ],
       "direction": "westerly",
       "weekly_outlook": [
             {
                   "day": "Fri",
-                  "low": 6,
-                  "high": 21,
+                  "low": 7,
+                  "high": 29,
                   "direction": "westerly"
             },
             {
@@ -749,39 +908,171 @@ async function loadData() {
       "time_segments": [
             {
                   "period": "Early",
-                  "low": 6,
-                  "high": 10
+                  "low": 7,
+                  "high": 19
             },
             {
                   "period": "Afternoon",
                   "low": 10,
-                  "high": 21
+                  "high": 24
             }
       ],
       "zone_periods": [
             {
+                  "zone": "Viento",
+                  "period": "Early",
+                  "low": 16,
+                  "high": 19
+            },
+            {
                   "zone": "Stevenson",
                   "period": "Early",
-                  "low": 6,
+                  "low": 7,
                   "high": 10
             },
             {
                   "zone": "Stevenson",
                   "period": "Afternoon",
-                  "low": 17,
-                  "high": 21
+                  "low": 21,
+                  "high": 25
             },
             {
                   "zone": "Lyle",
                   "period": "Afternoon",
-                  "low": 17,
-                  "high": 21
+                  "low": 21,
+                  "high": 29
             },
             {
                   "zone": "The Hatch",
                   "period": "Afternoon",
                   "low": 17,
                   "high": 20
+            },
+            {
+                  "zone": "Stevenson",
+                  "period": "Dawn",
+                  "low": 13,
+                  "high": 16
+            },
+            {
+                  "zone": "Stevenson",
+                  "period": "Morning",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Stevenson",
+                  "period": "Evening",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Viento",
+                  "period": "Dawn",
+                  "low": 20,
+                  "high": 23
+            },
+            {
+                  "zone": "Viento",
+                  "period": "Morning",
+                  "low": 22,
+                  "high": 25
+            },
+            {
+                  "zone": "Viento",
+                  "period": "Afternoon",
+                  "low": 20,
+                  "high": 23
+            },
+            {
+                  "zone": "Viento",
+                  "period": "Evening",
+                  "low": 22,
+                  "high": 25
+            },
+            {
+                  "zone": "Swell City",
+                  "period": "Dawn",
+                  "low": 20,
+                  "high": 23
+            },
+            {
+                  "zone": "Swell City",
+                  "period": "Morning",
+                  "low": 22,
+                  "high": 25
+            },
+            {
+                  "zone": "Swell City",
+                  "period": "Afternoon",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Swell City",
+                  "period": "Evening",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Lyle",
+                  "period": "Dawn",
+                  "low": 14,
+                  "high": 17
+            },
+            {
+                  "zone": "Lyle",
+                  "period": "Morning",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Lyle",
+                  "period": "Evening",
+                  "low": 22,
+                  "high": 25
+            },
+            {
+                  "zone": "Rufus",
+                  "period": "Dawn",
+                  "low": 10,
+                  "high": 13
+            },
+            {
+                  "zone": "Rufus",
+                  "period": "Afternoon",
+                  "low": 26,
+                  "high": 29
+            },
+            {
+                  "zone": "Rufus",
+                  "period": "Evening",
+                  "low": 26,
+                  "high": 29
+            },
+            {
+                  "zone": "Roosevelt",
+                  "period": "Dawn",
+                  "low": 10,
+                  "high": 13
+            },
+            {
+                  "zone": "Roosevelt",
+                  "period": "Morning",
+                  "low": 13,
+                  "high": 16
+            },
+            {
+                  "zone": "Roosevelt",
+                  "period": "Afternoon",
+                  "low": 17,
+                  "high": 20
+            },
+            {
+                  "zone": "Roosevelt",
+                  "period": "Evening",
+                  "low": 22,
+                  "high": 25
             }
       ]
 };
@@ -1137,7 +1428,7 @@ function render(data) {
   const wrap = document.getElementById('sources');
   wrap.innerHTML = '';
   data.sources.forEach((s, i) => {
-    const card = document.createElement('div');
+    const card = document.createElement(s.error ? 'div' : 'a');
     card.className = 'card ' + (i === 0 ? 'green-edge' : 'yellow-edge');
     if (s.error) {
       card.innerHTML = `<div class="card-content"><div class="card-top"><div class="source-name">${s.source}</div></div>
@@ -1145,22 +1436,22 @@ function render(data) {
       wrap.appendChild(card);
       return;
     }
+    card.href = s.url;
+    card.target = '_blank';
+    card.rel = 'noopener';
     card.innerHTML = `
       <div class="card-content">
         <div class="card-top">
-          <div class="source-name">${s.source}</div>
-          <button class="copy-btn" type="button" title="Copy to share" aria-label="Copy forecast to clipboard">⧉</button>
+          <div class="source-name">${s.source}
+            <svg class="ext-link-icon" viewBox="0 0 24 24" width="14" height="14">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <polyline points="15 3 21 3 21 9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+            </svg>
+          </div>
         </div>
         ${s.credibility ? `<div class="credibility">${s.credibility}</div>` : ''}
-        <div class="headline">${s.headline || ''}</div>
-        <div class="forecast-text">${s.forecast_text}</div>
-        <div class="badges inline">${(s.flags||[]).map(flagHTML).join('')}</div>
-        <a class="source-link" href="${s.url}" target="_blank" rel="noopener">Open original source →</a>
       </div>`;
-    card.querySelector('.copy-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      copySourceToClipboard(s, data.generated_at, e.currentTarget);
-    });
     wrap.appendChild(card);
   });
   setupTooltipDismiss(document);
