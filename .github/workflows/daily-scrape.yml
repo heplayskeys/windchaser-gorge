@@ -9,9 +9,11 @@ name: Daily Gorge Wind Scrape
 
 on:
   schedule:
-    # 14:00 UTC = 6/7am Pacific depending on DST — adjust to when both
-    # sites have posted their forecast for the day
-    - cron: "0 14 * * *"
+    # 17:05 UTC = 9:05am PST (winter). Cron runs in UTC and does NOT
+    # auto-adjust for daylight saving, so during PDT (summer, most of the
+    # year) this actually fires at 10:05am Pacific local time — later, not
+    # earlier, so if anything it's extra safe margin after both sites post.
+    - cron: "5 17 * * *"
   workflow_dispatch: {} # lets you trigger it manually from the Actions tab
 
 permissions:

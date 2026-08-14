@@ -506,7 +506,11 @@ def scrape_victor():
             continue
         if any(marker in text.lower() for marker in COAST_MARKERS):
             continue  # Coast/marine section — not applicable to Gorge kiting
-        if re.search(r"\bMPH\b|\bWIND\b|\bKT\b", text, re.I):
+        # Require an actual wind NUMBER, not just the bare word "wind" —
+        # his page repeats "WIND PREDICTOR" branding in the header/nav,
+        # which was satisfying a looser check and getting picked over his
+        # real forecast text.
+        if re.search(r"\d{1,2}-\d{1,2}\s?mph|\d{1,2}\s?mph|\d{1,2}-\d{1,2}\s?kt", text, re.I):
             candidates.append(text)
 
     seen, unique = set(), []
@@ -517,13 +521,17 @@ def scrape_victor():
             unique.append(c)
 
     raw_text = unique[0] if unique else ""
-    headline_raw = clean(soup.title.string) if soup.title else ""
+    normalized = normalize_case(raw_text) if raw_text else "Forecast text not found — site layout may have changed."
+    # Headline: use the real forecast's own first sentence rather than the
+    # static <title> tag (which is just his site name every day, not
+    # today's actual headline, and isn't reliably locatable in the DOM).
+    headline = normalized.split(".")[0].strip() if raw_text else ""
 
     return {
         "source": "Victor the Inflictor",
         "url": VTI_URL,
-        "headline": normalize_case(headline_raw.split("-")[0]) if headline_raw else "",
-        "forecast_text": normalize_case(raw_text) if raw_text else "Forecast text not found — site layout may have changed.",
+        "headline": headline,
+        "forecast_text": normalized,
         "credibility": CREDIBILITY["Victor the Inflictor"],
         "zones": extract_zones(raw_text),
         "flags": extract_flags(raw_text),
@@ -536,10 +544,20 @@ def scrape_victor():
 
 def scrape_gorge_gym():
     soup = fetch(GORGE_GYM_URL)
+
+    # Anchor to the SHORT-TERM subheading specifically, not the top-level
+    # "GORGE WIND FORECAST" heading — a sensor-calibration disclaimer
+    # paragraph ("30mph at Rufus is about 23-24mph at Swell...") sits
+    # between the two, and was eating slots meant for the real narrative.
     heading = soup.find(
-        lambda tag: tag.name in ("h1", "h2", "h3", "h4")
-        and "GORGE WIND FORECAST" in tag.get_text().upper()
+        lambda tag: tag.name and re.match(r"h[1-6]$", tag.name)
+        and "SHORT-TERM" in tag.get_text().upper()
     )
+    if not heading:  # fallback if she ever drops the SHORT-TERM subheading
+        heading = soup.find(
+            lambda tag: tag.name in ("h1", "h2", "h3", "h4")
+            and "GORGE WIND FORECAST" in tag.get_text().upper()
+        )
 
     paragraphs = []
     if heading:
@@ -573,10 +591,21 @@ def scrape_gorge_gym():
                     outlook_paragraphs.append(text)
     outlook_text = " ".join(outlook_paragraphs)
 
+    # Headline: the actual post title. Her theme uses <h1> for BOTH the
+    # site logo ("The Gorge Is My Gym") and the real post title, so we
+    # skip any short h1 that's just the site name and take the first
+    # substantial one.
+    headline_raw = ""
+    for h in soup.find_all("h1"):
+        txt = clean(h.get_text(" "))
+        if len(txt) > 20 and "the gorge is my gym" not in txt.lower():
+            headline_raw = txt
+            break
+
     return {
         "source": "The Gorge Is My Gym (Temira)",
         "url": GORGE_GYM_URL,
-        "headline": clean(soup.title.string).replace(" - The Gorge Is My Gym", "") if soup.title else "",
+        "headline": headline_raw,
         "forecast_text": raw_text or "Forecast text not found — site layout may have changed.",
         "credibility": CREDIBILITY["The Gorge Is My Gym (Temira)"],
         "zones": extract_zones(raw_text),

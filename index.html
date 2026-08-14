@@ -158,7 +158,9 @@
   .legend { display: flex; flex-wrap: wrap; gap: 0.55rem 0.9rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); }
   .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
   .swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
-  .zone-header-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .zone-caption-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-bottom: 0.6rem; }
+  .zone-caption-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); }
+  .zone-caption-icon { color: var(--text-low); flex: 0 0 auto; }
   .period-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
   .period-buttons button {
     font-family: 'IBM Plex Mono', monospace;
@@ -191,7 +193,7 @@
   .zone-kite-header { flex: 0 0 54px; text-align: right; line-height: 1; color: var(--text-mid); display: flex; justify-content: flex-end; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
   .skull-swatch { width: auto; height: auto; font-size: 0.75rem; line-height: 1; background: none !important; }
 
-  .outlook-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+  .outlook-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; max-width: 340px; margin: 0 auto; }
   .outlook-day {
     flex: 0 0 76px;
     min-height: 108px;
@@ -367,17 +369,13 @@
     </div>
     <div class="sub" id="zonesSub">Today's wind — WESTERLY</div>
     <div class="period-buttons" id="periodButtons"></div>
-    <div class="zone-header-row">
-      <div class="zone-label"></div>
-      <div class="zone-track"></div>
-      <div class="zone-value"></div>
-      <div class="zone-kite-header" title="Recommended kite size">
-        <svg viewBox="0 0 100 100" width="16" height="16">
-          <path d="M2,60 A48,48 0 0 1 98,60 L82,60 A32,32 0 0 0 18,60 Z" fill="currentColor"/>
-          <path d="M6,58 L48,92 M94,58 L52,92" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
-          <ellipse cx="50" cy="94" rx="7" ry="8" fill="currentColor"/>
-        </svg>
-      </div>
+    <div class="zone-caption-row">
+      <span class="zone-caption-label">Kite size</span>
+      <svg viewBox="0 0 100 100" width="14" height="14" class="zone-caption-icon" title="Recommended kite size">
+        <path d="M2,60 A48,48 0 0 1 98,60 L82,60 A32,32 0 0 0 18,60 Z" fill="currentColor"/>
+        <path d="M6,58 L48,92 M94,58 L52,92" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="94" rx="7" ry="8" fill="currentColor"/>
+      </svg>
     </div>
     <div id="zoneRows"></div>
     <div class="legend" id="windLegend"></div>
