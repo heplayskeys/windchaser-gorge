@@ -57,19 +57,22 @@
 
   header { padding-top: max(1.5rem, env(safe-area-inset-top)); }
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.13em; color: var(--text-low); text-transform: uppercase; }
-  .header-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
   .a11y-toggle {
+    position: fixed;
+    right: max(1.1rem, env(safe-area-inset-right) + 0.6rem);
+    bottom: max(1.1rem, env(safe-area-inset-bottom) + 0.6rem);
+    z-index: 45;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 52px;
+    height: 52px;
     color: var(--text-mid);
     background: var(--panel-raised);
     border: 1px solid var(--panel-line);
-    border-radius: 999px;
-    padding: 0.45rem;
-    min-height: 36px;
-    min-width: 36px;
+    border-radius: 50%;
     cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
   }
   .a11y-toggle[aria-pressed="true"] { background: var(--yellow); color: var(--yellow-ink); border-color: var(--yellow); }
   h1 {
@@ -247,6 +250,7 @@
   .outlook-row-bottom { grid-template-columns: repeat(3, 1fr); max-width: 75%; margin: 0.4rem auto 0; }
   .outlook-row-bottom:empty { display: none; margin: 0; }
   .outlook-day {
+    position: relative;
     min-height: 108px;
     display: flex;
     flex-direction: column;
@@ -260,6 +264,7 @@
     font: inherit;
   }
   .outlook-day.empty { cursor: default; }
+  .outlook-expand-icon { position: absolute; top: 5px; right: 5px; width: 12px; height: 12px; opacity: 0.7; }
   .outlook-day .dname { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap { display: flex; align-items: center; justify-content: center; gap: 0.2rem; margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; }
@@ -498,6 +503,7 @@
   .outlook-modal-row .val { color: var(--text-hi); font-weight: 600; }
   .outlook-modal-zones-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--panel-line); }
   .outlook-modal-note { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--text-low); line-height: 1.5; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--panel-line); }
+  .outlook-modal-source { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-low); margin-bottom: 0.8rem; }
 
   /* ---------- Source cards — each one is a plain link to the original site ---------- */
   .sources { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
@@ -568,7 +574,7 @@ html.a11y .outlook-day .range, html.a11y .live-loading, html.a11y .badge {
 }
 html.a11y .segmented a, html.a11y .pill, html.a11y .period-buttons button,
 html.a11y .outlook-day, html.a11y .live-location-trigger, html.a11y .card,
-html.a11y .modal-close, html.a11y .a11y-toggle {
+html.a11y .modal-close {
   min-height: 46px;
 }
 html.a11y .pill { padding: 0.5rem 0.8rem; }
@@ -584,12 +590,10 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
 <div class="wrap">
 <header>
   <div class="eyebrow">Columbia River Gorge · Kite &amp; Wind Conditions</div>
-  <div class="header-top-row">
-    <h1>Today's <span>Wind</span></h1>
-    <button type="button" id="a11yToggle" class="a11y-toggle" aria-pressed="false" aria-label="Toggle accessible view"><svg viewBox="0 0 24 24" width="19" height="19"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-  </div>
+  <h1>Today's <span>Wind</span></h1>
   <div id="updated">Loading latest readings…</div>
 </header>
+<button type="button" id="a11yToggle" class="a11y-toggle" aria-pressed="false" aria-label="Toggle accessible view"><svg viewBox="0 0 24 24" width="19" height="19"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
 </div>
 
 <div class="navbar">
@@ -652,6 +656,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
     <div class="sub">A quick look at wind trends for the week ahead</div>
     <div id="outlookRowTop" class="outlook-row"></div>
     <div id="outlookRowBottom" class="outlook-row outlook-row-bottom"></div>
+    <div class="chart-hint">Tap any day for details</div>
   </section>
 
   <section id="live" class="panel">
@@ -1414,6 +1419,84 @@ const LIVE_LOCATIONS = [
 
 const LIVE_CACHE_TTL_MS = 12 * 60 * 60 * 1000; // matches the 12h sparkline window
 
+// Fetches 7 days of hourly wind speed for every known location, used to
+// build genuine per-location weekly outlook data (future days don't get
+// this from Victor/Temira's prose, which only ever gives one blended range
+// per day with no zone attribution — Open-Meteo gives us real per-spot
+// numbers instead, same way we already use it for Live Model Data).
+async function fetchWeeklyLocationForecasts() {
+  const cacheKey = 'weeklyLocationForecasts';
+  try {
+    const raw = sessionStorage.getItem(cacheKey);
+    if (raw) {
+      const { data, timestamp } = JSON.parse(raw);
+      if (Date.now() - timestamp < LIVE_CACHE_TTL_MS) return data;
+    }
+  } catch (e) {}
+
+  const results = {};
+  await Promise.all(LIVE_LOCATIONS.map(async (loc) => {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
+        `&hourly=wind_speed_10m&wind_speed_unit=kn&timezone=auto&forecast_days=7`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('open-meteo unavailable');
+      const json = await res.json();
+      results[loc.name] = json.hourly || null;
+    } catch (e) {
+      results[loc.name] = null;
+    }
+  }));
+
+  try { sessionStorage.setItem(cacheKey, JSON.stringify({ data: results, timestamp: Date.now() })); } catch (e) {}
+  return results;
+}
+
+// Collapses the 8-location hourly data into one entry per calendar date:
+// each location's own low/high for that day, a "typical" value (average of
+// each location's own average, then averaged across locations — the
+// weighting approach requested), and the overall span across all locations
+// for the displayed range.
+function aggregateWeeklyForecast(locationData) {
+  const byDate = {};
+  for (const locName in locationData) {
+    const d = locationData[locName];
+    if (!d || !d.time) continue;
+    d.time.forEach((t, i) => {
+      const dateStr = t.slice(0, 10);
+      const speed = d.wind_speed_10m[i];
+      if (speed == null) return;
+      if (!byDate[dateStr]) byDate[dateStr] = {};
+      if (!byDate[dateStr][locName]) {
+        byDate[dateStr][locName] = { low: speed, high: speed };
+      } else {
+        byDate[dateStr][locName].low = Math.min(byDate[dateStr][locName].low, speed);
+        byDate[dateStr][locName].high = Math.max(byDate[dateStr][locName].high, speed);
+      }
+    });
+  }
+
+  const result = {};
+  for (const dateStr in byDate) {
+    const perLoc = byDate[dateStr];
+    const zones = Object.keys(perLoc).map(name => ({
+      zone: name.split(',')[0],
+      low: Math.round(perLoc[name].low),
+      high: Math.round(perLoc[name].high),
+    }));
+    if (!zones.length) continue;
+    const locAvgs = zones.map(z => (z.low + z.high) / 2);
+    const avgKn = locAvgs.reduce((a, b) => a + b, 0) / locAvgs.length;
+    result[dateStr] = {
+      low: Math.min(...zones.map(z => z.low)),
+      high: Math.max(...zones.map(z => z.high)),
+      avgKn,
+      zones,
+    };
+  }
+  return result;
+}
+
 function getCachedLive(lat, lon) {
   try {
     const raw = sessionStorage.getItem(`live_${lat}_${lon}`);
@@ -2048,17 +2131,20 @@ function renderLegend() {
 let currentOutlookDays = [];
 let currentOutlookDirection = 'westerly';
 
-function outlookDayHTML(d, fallbackDirection, idx) {
-  if (d.low == null || d.high == null) {
+function outlookDayHTML(d, idx) {
+  if (d.loKn == null || d.hiKn == null) {
     return `<div class="outlook-day empty"><div class="dname">${d.day}</div><div class="none">No data</div></div>`;
   }
-  const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
-  const dir = d.direction || fallbackDirection || 'westerly';
+  const dir = d.direction || currentOutlookDirection || 'westerly';
   const deg = directionArrowDeg(dir);
   const letter = directionLetter(dir);
-  const band = windBand(hiKn);
+  // Color reflects the weighted "typical" value across locations, not the
+  // span's raw high — a day that's mostly 15-18kn with one 25kn outlier
+  // location shouldn't read as a strong-wind day at a glance.
+  const band = windBand(d.avgKn != null ? d.avgKn : d.hiKn);
   return `
     <button type="button" class="outlook-day" data-day-idx="${idx}" style="background:${band.color};border-color:${band.color}">
+      <svg class="outlook-expand-icon" viewBox="0 0 24 24" style="color:${band.ink}"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="dname" style="color:${band.ink}">${d.day}</div>
       <div class="arrow-wrap">
         <svg viewBox="0 0 24 24" style="transform:rotate(${deg}deg)">
@@ -2066,25 +2152,55 @@ function outlookDayHTML(d, fallbackDirection, idx) {
         </svg>
         <span class="dir-letter" style="color:${band.ink}">${letter}</span>
       </div>
-      <div class="range" style="color:${band.ink}">${loKn}–${hiKn}</div>
+      <div class="range" style="color:${band.ink}">${d.loKn}–${d.hiKn}</div>
       <div class="kite" style="color:${band.ink};opacity:0.85">${band.kite}</div>
     </button>`;
 }
 
-function renderOutlook(days, fallbackDirection) {
+async function renderOutlook(days, fallbackDirection) {
   const topRow = document.getElementById('outlookRowTop');
   const bottomRow = document.getElementById('outlookRowBottom');
-  currentOutlookDays = days || [];
   currentOutlookDirection = fallbackDirection || 'westerly';
   if (!days || !days.length) {
     topRow.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No multi-day breakdown available today — check Temira's full forecast for the extended outlook.</div>`;
     bottomRow.innerHTML = '';
     return;
   }
-  const first4 = days.slice(0, 4);
-  const rest = days.slice(4);
-  topRow.innerHTML = first4.map((d, i) => outlookDayHTML(d, fallbackDirection, i)).join('');
-  bottomRow.innerHTML = rest.map((d, i) => outlookDayHTML(d, fallbackDirection, i + 4)).join('');
+
+  const locationData = await fetchWeeklyLocationForecasts();
+  const meteoByDate = aggregateWeeklyForecast(locationData);
+  const todayZones = (currentData && currentData.zones) || [];
+
+  currentOutlookDays = days.map((d, idx) => {
+    if (idx === 0) {
+      // Today: real scraped per-zone data (prose + windtable OCR)
+      const zonesKn = todayZones.map(z => ({ zone: z.zone, low: mphToKn(z.low), high: mphToKn(z.high) }));
+      const locAvgs = zonesKn.map(z => (z.low + z.high) / 2);
+      return {
+        day: d.day, direction: d.direction,
+        loKn: d.low != null ? mphToKn(d.low) : null,
+        hiKn: d.high != null ? mphToKn(d.high) : null,
+        avgKn: locAvgs.length ? locAvgs.reduce((a, b) => a + b, 0) / locAvgs.length : null,
+        source: 'scraped', zonesKn,
+      };
+    }
+    // Future days: Open-Meteo per-location data, keyed by actual calendar date
+    const dateStr = new Date(Date.now() + idx * 86400000).toISOString().slice(0, 10);
+    const agg = meteoByDate[dateStr];
+    if (agg) {
+      return {
+        day: d.day, direction: d.direction,
+        loKn: agg.low, hiKn: agg.high, avgKn: agg.avgKn,
+        source: 'meteo', zonesKn: agg.zones,
+      };
+    }
+    return { day: d.day, direction: d.direction, loKn: null, hiKn: null, avgKn: null, source: 'none', zonesKn: null };
+  });
+
+  const first4 = currentOutlookDays.slice(0, 4);
+  const rest = currentOutlookDays.slice(4);
+  topRow.innerHTML = first4.map((d, i) => outlookDayHTML(d, i)).join('');
+  bottomRow.innerHTML = rest.map((d, i) => outlookDayHTML(d, i + 4)).join('');
 
   document.querySelectorAll('.outlook-day[data-day-idx]').forEach(btn => {
     btn.addEventListener('click', () => openOutlookModal(parseInt(btn.dataset.dayIdx, 10)));
@@ -2093,29 +2209,31 @@ function renderOutlook(days, fallbackDirection) {
 
 function openOutlookModal(idx) {
   const d = currentOutlookDays[idx];
-  if (!d || d.low == null || d.high == null) return;
-  const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
+  if (!d || d.loKn == null || d.hiKn == null) return;
   const dir = d.direction || currentOutlookDirection || 'westerly';
-  const band = windBand(hiKn);
+  const band = windBand(d.avgKn != null ? d.avgKn : d.hiKn);
 
-  // Per-zone breakdown only exists for TODAY (index 0) — the scrape gives us
-  // real per-spot numbers for today via prose + windtable OCR, but future
-  // days only ever have one aggregate range, no zone attribution.
+  const sourceLabel = d.source === 'scraped'
+    ? 'Source: Victor the Inflictor &amp; The Gorge Is My Gym (Temira)'
+    : d.source === 'meteo'
+      ? 'Source: Open-Meteo forecast model'
+      : '';
+
   let zonesHTML = '';
-  if (idx === 0 && currentData && currentData.zones && currentData.zones.length) {
+  if (d.zonesKn && d.zonesKn.length) {
+    const title = idx === 0 ? 'By spot today' : 'By spot (model estimate)';
     zonesHTML = `
-      <div class="outlook-modal-zones-title">By spot today</div>
-      ${currentData.zones.map(z => `
-        <div class="outlook-modal-row"><span class="lbl">${z.zone}</span><span class="val">${mphToKn(z.low)}–${mphToKn(z.high)}kn</span></div>
+      <div class="outlook-modal-zones-title">${title}</div>
+      ${d.zonesKn.map(z => `
+        <div class="outlook-modal-row"><span class="lbl">${z.zone}</span><span class="val">${z.low}–${z.high}kn</span></div>
       `).join('')}
     `;
-  } else if (idx !== 0) {
-    zonesHTML = `<div class="outlook-modal-note">Per-spot breakdown isn't available for future days — only today's forecast breaks out by zone.</div>`;
   }
 
   document.getElementById('outlookModalTitle').textContent = d.day;
   document.getElementById('outlookModalBody').innerHTML = `
-    <div class="outlook-modal-range" style="color:${band.color}">${loKn}<span>–</span>${hiKn}<span class="unit">kn</span></div>
+    ${sourceLabel ? `<div class="outlook-modal-source">${sourceLabel}</div>` : ''}
+    <div class="outlook-modal-range" style="color:${band.color}">${d.loKn}<span>–</span>${d.hiKn}<span class="unit">kn</span></div>
     <div class="outlook-modal-row"><span class="lbl">Direction</span><span class="val">${directionLabel(dir)}</span></div>
     <div class="outlook-modal-row"><span class="lbl">Recommended kite</span><span class="val">${band.kite}</span></div>
     <div class="outlook-modal-row"><span class="lbl">Conditions</span><span class="val">${band.label}</span></div>
