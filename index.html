@@ -374,7 +374,7 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
   .live-current { display: flex; gap: 1.6rem; margin-bottom: 1rem; flex-wrap: wrap; min-height: 70px; }
-  .live-stat { position: relative; cursor: pointer; }
+  .live-stat { position: relative; cursor: pointer; min-width: 82px; }
   .live-stat .num { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.7rem; color: var(--text-hi); line-height: 1; }
   .stat-tip[hidden] { display: none; }
   .stat-tip {
@@ -397,6 +397,8 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     white-space: normal;
   }
+  .tip-term { display: block; font-weight: 700; color: var(--yellow); margin-top: 0.2rem; }
+  .tip-term:first-of-type { margin-top: 0.4rem; }
   .stat-tip::after {
     content: "";
     position: absolute;
@@ -1514,6 +1516,7 @@ async function selectLivePeriod(periodKey) {
 
   document.getElementById('liveLoading').hidden = true;
   renderLiveChart(periodKey);
+  renderStatsBlock(currentChartStartIdx, statsLabel(currentChartStartIdx));
 }
 
 function setupLiveRangePicker() {
@@ -1655,8 +1658,8 @@ function renderStatsBlock(idx, label, overrideValues) {
   }
 
   const TIPS = {
-    kn: 'Current sustained wind speed (kn).<br><br>Steady | Building | Dropping',
-    gust: 'Strongest gusts (kn) expected.<br><br>Consistent | Some Gusts | Gusty',
+    kn: 'Current sustained wind speed (kn).<br><br><span class="tip-term">Steady</span><span class="tip-term">Building</span><span class="tip-term">Dropping</span>',
+    gust: 'Strongest gusts (kn) expected.<br><br><span class="tip-term">Consistent</span><span class="tip-term">Some Gusts</span><span class="tip-term">Gusty</span>',
     dir: 'Compass direction of the wind.',
     temp: 'Air temperature at location (°F).',
   };
@@ -1671,6 +1674,7 @@ function renderStatsBlock(idx, label, overrideValues) {
 }
 
 let currentPeriodKey = 'Now';
+let currentChartStartIdx = 0;
 
 // Duration scales gently with text length so longer descriptions get more
 // time to read, capped at a sensible range.
@@ -1738,6 +1742,7 @@ function renderLiveChart(periodKey) {
   const speeds = allSpeeds.slice(startIdx, endIdx + 1);
   const gusts = allGusts.slice(startIdx, endIdx + 1);
   const times = allTimes.slice(startIdx, endIdx + 1);
+  currentChartStartIdx = startIdx;
 
   // Real margins on all four sides so nothing (axis labels, the last hour
   // label, the 0kn tick) ever sits exactly on the viewBox edge, where it
