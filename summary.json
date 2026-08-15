@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-08-14T17:58:25.716015+00:00",
+  "generated_at": "2026-08-15T17:29:01.899958+00:00",
   "sources": [
     {
       "source": "Victor the Inflictor",
       "url": "https://victortheinflictor.com",
       "credibility": "40+ years reading Gorge wind",
-      "ai_summary": "There is no strong wind today except for a late-day west puff reaching up to 15 mph in select areas.",
+      "ai_summary": "Expect good west winds of 22 to 25+ mph in the Gorge today, though afternoon thunderstorms could impact wind speeds.",
       "zones": [],
       "flags": [
         {
           "label": "Smoke / Haze",
           "level": "caution",
-          "context": "\u2026Paypal drop your email & join the storm join the impact 6:3 smokey glass ...late west puff...good music tonight s theodore ro\u2026",
-          "where": null
+          "context": "\u2026Ctor wind predictor 6:30 AM ... clouds inland to Stevenson..hazy out east ...south onshore flow 40 yrs experience... venmo @\u2026",
+          "where": "Stevenson"
         }
       ],
       "mph_mentions": [],
@@ -23,7 +23,7 @@
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
-      "ai_summary": "Today brings one last day of steady west wind at 17-20mph between Viento and Hood River before a heat wave arrives.",
+      "ai_summary": "Expect steady west winds of 17-20 mph today between Viento and Hood River, with a possible brief morning lull.",
       "zones": [
         {
           "zone": "Stevenson",
@@ -451,28 +451,21 @@
     {
       "label": "Smoke / Haze",
       "level": "caution",
-      "context": "\u2026Paypal drop your email & join the storm join the impact 6:3 smokey glass ...late west puff...good music tonight s theodore ro\u2026",
-      "where": null
+      "context": "\u2026Ctor wind predictor 6:30 AM ... clouds inland to Stevenson..hazy out east ...south onshore flow 40 yrs experience... venmo @\u2026",
+      "where": "Stevenson"
     }
   ],
   "agreement_zones": [
-    "Hood River",
     "Stevenson",
     "Viento"
   ],
   "direction": "westerly",
   "weekly_outlook": [
     {
-      "day": "Fri",
+      "day": "Sat",
       "low": 7,
       "high": 29,
       "direction": "westerly"
-    },
-    {
-      "day": "Sat",
-      "low": null,
-      "high": null,
-      "direction": null
     },
     {
       "day": "Sun",
@@ -500,6 +493,12 @@
     },
     {
       "day": "Thu",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Fri",
       "low": null,
       "high": null,
       "direction": null
