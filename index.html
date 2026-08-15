@@ -379,8 +379,9 @@
   .stat-tip[hidden] { display: none; }
   .stat-tip {
     position: absolute;
-    bottom: calc(100% + 10px);
-    left: 0;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(calc(-50% + var(--tip-shift, 0px)));
     z-index: 30;
     width: 220px;
     max-width: 70vw;
@@ -396,7 +397,25 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     white-space: normal;
   }
-  .live-stat:last-child .stat-tip { left: auto; right: 0; }
+  .stat-tip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: calc(50% - var(--tip-shift, 0px));
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--panel-line);
+  }
+  .stat-tip::before {
+    content: "";
+    position: absolute;
+    top: calc(100% - 1px);
+    left: calc(50% - var(--tip-shift, 0px));
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--panel-raised);
+    z-index: 1;
+  }
   .live-stat .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.2rem; white-space: nowrap; }
   .live-stat .sublbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; font-weight: 600; color: var(--yellow); white-space: nowrap; }
   svg.sparkline { width: 100%; height: auto; display: block; margin-top: 0.6rem; }
@@ -452,8 +471,26 @@
   .modal-legend { display: flex; gap: 1.2rem; margin-top: 0.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; color: var(--text-mid); }
   .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
   .legend-item .swatch { width: 16px; height: 2px; display: inline-block; }
-  .legend-item .swatch.solid { background: var(--yellow); }
-  .legend-item .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
+  .swatch.solid { background: var(--yellow); }
+  .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
+  .chart-point { cursor: pointer; }
+  .chart-tip[hidden] { display: none; }
+  .chart-tip {
+    position: fixed;
+    z-index: 40;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--text-hi);
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
+    white-space: nowrap;
+  }
+  .chart-tip-hour { font-weight: 700; color: var(--yellow); margin-bottom: 0.3rem; }
+  .chart-tip-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.74rem; color: var(--text-mid); }
+  .chart-tip-row + .chart-tip-row { margin-top: 0.15rem; }
   .outlook-modal-range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: 1rem; }
   .outlook-modal-range .unit { font-size: 1rem; font-family: 'IBM Plex Mono', monospace; margin-left: 0.4rem; color: var(--text-mid); }
   .outlook-modal-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
@@ -641,6 +678,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
     <hr class="section-divider">
     <svg class="modal-chart" id="sparkline" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="modal-legend" id="sparkLegend"></div>
+    <div class="chart-tip" id="chartTip" hidden></div>
   </section>
 
   <div class="modal-overlay" id="outlookModal" hidden>
@@ -1566,10 +1604,10 @@ function renderLive(data, locationName) {
   }
 
   const TIPS = {
-    kn: 'Current sustained wind speed, in knots, from the Open-Meteo forecast model. "Steady/Building/Dropping" shows whether this is expected to change over the next few hours.',
-    gust: 'The strongest gusts expected right now, in knots. "Consistent/Some gusts/Gusty" describes how much stronger gusts run compared to the sustained speed above — not whether it\'s changing over time.',
-    dir: 'The compass direction the wind is currently blowing from.',
-    temp: 'Current air temperature at this location, in Fahrenheit.',
+    kn: 'Current sustained wind speed (kn).<br><br>Steady | Building | Dropping',
+    gust: 'Strongest gusts (kn) expected.<br><br>Consistent | Some Gusts | Gusty',
+    dir: 'Compass direction of the wind.',
+    temp: 'Air temperature at location (°F).',
   };
 
   currentWrap.innerHTML = `
@@ -1592,6 +1630,19 @@ function tipDuration(text) {
   return Math.max(8000, Math.min(10000, 8000 + (text.length - 80) * 15));
 }
 
+function clampTooltip(tip) {
+  tip.style.setProperty('--tip-shift', '0px');
+  const rect = tip.getBoundingClientRect();
+  const margin = 10;
+  let shift = 0;
+  if (rect.left < margin) {
+    shift = margin - rect.left;
+  } else if (rect.right > window.innerWidth - margin) {
+    shift = (window.innerWidth - margin) - rect.right;
+  }
+  if (shift !== 0) tip.style.setProperty('--tip-shift', `${shift}px`);
+}
+
 function setupStatTooltips(container) {
   let timer = null;
   container.querySelectorAll('.live-stat').forEach(stat => {
@@ -1604,6 +1655,7 @@ function setupStatTooltips(container) {
       clearTimeout(timer);
       if (!wasOpen) {
         tip.hidden = false;
+        clampTooltip(tip);
         timer = setTimeout(() => { tip.hidden = true; }, tipDuration(tip.textContent));
       }
     });
@@ -1611,6 +1663,8 @@ function setupStatTooltips(container) {
 }
 document.addEventListener('click', () => {
   document.querySelectorAll('.stat-tip').forEach(t => t.hidden = true);
+  const chartTip = document.getElementById('chartTip');
+  if (chartTip) chartTip.hidden = true;
 });
 
 function renderLiveChart(hours) {
@@ -1637,6 +1691,10 @@ function renderLiveChart(hours) {
   const speedPts = speeds.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
   const gustPts = gusts.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
   const ticks = [0, Math.round(max / 2), Math.round(max)];
+  const minorTicks = [];
+  for (let v = 5; v < max; v += 5) {
+    if (!ticks.includes(v)) minorTicks.push(v);
+  }
   const labelStep = hours <= 6 ? 1 : 3;
   const hourLabels = speeds.map((_, i) => {
     if (i % labelStep !== 0) return '';
@@ -1646,6 +1704,10 @@ function renderLiveChart(hours) {
 
   spark.setAttribute('viewBox', `0 0 ${w} ${h}`);
   spark.innerHTML = `
+    ${minorTicks.map(v => {
+      const y = yOf(v);
+      return `<line x1="${leftPad}" y1="${y}" x2="${w - rightPad}" y2="${y}" stroke="var(--panel-line)" stroke-width="0.6" stroke-dasharray="1,4" opacity="0.5"/>`;
+    }).join('')}
     ${ticks.map(v => {
       const y = yOf(v);
       return `<line x1="${leftPad}" y1="${y}" x2="${w - rightPad}" y2="${y}" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3,4"/>
@@ -1653,13 +1715,48 @@ function renderLiveChart(hours) {
     }).join('')}
     <polyline points="${gustPts}" fill="none" stroke="var(--text-low)" stroke-width="1.6" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round"></polyline>
     <polyline points="${speedPts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
-    ${speeds.map((s, i) => `<circle cx="${x(i)}" cy="${yOf(s)}" r="3" fill="${windBand(s).color}"></circle>`).join('')}
+    ${speeds.map((s, i) => `<g class="chart-point" data-idx="${i}"><circle cx="${x(i)}" cy="${yOf(s)}" r="13" fill="transparent"></circle><circle cx="${x(i)}" cy="${yOf(s)}" r="3" fill="${windBand(s).color}"></circle></g>`).join('')}
     ${hourLabels}
   `;
   legend.innerHTML = `
     <span class="legend-item"><span class="swatch solid"></span>Wind speed</span>
     <span class="legend-item"><span class="swatch dashed"></span>Gusts</span>
   `;
+
+  spark.querySelectorAll('.chart-point').forEach(g => {
+    g.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(g.dataset.idx, 10);
+      showChartPointTip(spark, g, idx, speeds[idx], gusts[idx]);
+    });
+  });
+}
+
+let chartTipTimer = null;
+function showChartPointTip(svg, pointEl, idx, speedVal, gustVal) {
+  const tip = document.getElementById('chartTip');
+  const dot = pointEl.querySelectorAll('circle')[1]; // the small visible dot, not the hit target
+  const pt = svg.createSVGPoint();
+  pt.x = parseFloat(dot.getAttribute('cx'));
+  pt.y = parseFloat(dot.getAttribute('cy'));
+  const screenPt = pt.matrixTransform(svg.getScreenCTM());
+
+  const label = idx === 0 ? 'Now' : `+${idx}h`;
+  tip.innerHTML = `
+    <div class="chart-tip-hour">${label}</div>
+    <div class="chart-tip-row"><span class="swatch solid"></span>${Math.round(speedVal)}kn wind</div>
+    <div class="chart-tip-row"><span class="swatch dashed"></span>${Math.round(gustVal)}kn gust</div>
+  `;
+  tip.hidden = false;
+
+  const tipW = tip.offsetWidth, tipH = tip.offsetHeight, margin = 10;
+  let left = screenPt.x - tipW / 2;
+  left = Math.max(margin, Math.min(window.innerWidth - tipW - margin, left));
+  tip.style.left = `${left}px`;
+  tip.style.top = `${screenPt.y - tipH - 16}px`;
+
+  clearTimeout(chartTipTimer);
+  chartTipTimer = setTimeout(() => { tip.hidden = true; }, tipDuration(tip.textContent));
 }
 
 function drawTicks(svg) {
