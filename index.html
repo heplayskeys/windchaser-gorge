@@ -188,7 +188,7 @@
   .dial-ring { fill: none; stroke: rgba(255,255,255,0.16); stroke-width: 8; stroke-linecap: butt; }
 
   /* ---------- Panels ---------- */
-  .panel { margin-top: 1.4rem; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; padding: 1.15rem 1.2rem 1.3rem; }
+  .panel { position: relative; margin-top: 1.4rem; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; padding: 1.15rem 1.2rem 1.3rem; }
   .panel h2 { font-family: 'Big Shoulders Display', sans-serif; font-size: 1.05rem; text-transform: uppercase; color: var(--text-hi); margin-bottom: 0.15rem; }
   .panel-heading-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
   .period-hours { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); white-space: nowrap; }
@@ -476,9 +476,10 @@
   .swatch.solid { background: var(--yellow); }
   .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
   .chart-point { cursor: pointer; }
+  .chart-hint { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; font-weight: 600; color: var(--yellow); margin-bottom: 0.5rem; }
   .dot-tip[hidden] { display: none; }
   .dot-tip {
-    position: fixed;
+    position: absolute;
     z-index: 40;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.74rem;
@@ -553,6 +554,7 @@ html.a11y .live-current { grid-template-columns: repeat(2, 1fr); gap: 1rem 1.4re
 html.a11y .live-stat .num { font-size: 2.1rem; }
 html.a11y .live-stat .lbl { font-size: 0.85rem; }
 html.a11y .live-stat .sublbl { font-size: 0.82rem; }
+html.a11y .chart-hint { font-size: 0.92rem; }
 html.a11y .zone-label, html.a11y .zone-value { font-size: 1rem; white-space: nowrap; }
 html.a11y .zone-label { flex: 0 0 108px; }
 html.a11y .zone-value { flex: 0 0 76px; }
@@ -678,6 +680,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
     <div class="live-currently-label" id="liveCurrentlyLabel">Conditions at:</div>
     <div class="live-current" id="liveCurrent"></div>
     <hr class="section-divider">
+    <div class="chart-hint">Tap any dot for conditions at that hour</div>
     <svg class="modal-chart" id="sparkline" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="modal-legend" id="sparkLegend"></div>
     <div class="dot-tip" id="dotTip" hidden></div>
@@ -1806,8 +1809,8 @@ function renderLiveChart(periodKey) {
   // Fewer points on screen (named-period views) means more room per point,
   // so those dots can afford to be noticeably bigger without crowding —
   // accessible mode bumps this further for easier touch targets.
-  const dotR = (speeds.length <= 5 ? 7 : 5) + (isA11y ? 2 : 0);
-  const hitR = (speeds.length <= 5 ? 20 : 15) + (isA11y ? 4 : 0);
+  const dotR = (speeds.length <= 5 ? 9 : 7) + (isA11y ? 3 : 0);
+  const hitR = (speeds.length <= 5 ? 24 : 19) + (isA11y ? 5 : 0);
   const axisFontSize = isA11y ? 14 : 10;
   const tickFontSize = isA11y ? 15 : 11;
 
@@ -1866,15 +1869,17 @@ function showDotTip(svg, pointEl, text) {
   pt.x = parseFloat(dot.getAttribute('cx'));
   pt.y = parseFloat(dot.getAttribute('cy'));
   const screenPt = pt.matrixTransform(svg.getScreenCTM());
+  const panel = svg.closest('.panel');
+  const panelRect = panel.getBoundingClientRect();
 
   tip.textContent = text;
   tip.hidden = false;
 
   const tipW = tip.offsetWidth, tipH = tip.offsetHeight, margin = 10;
-  let left = screenPt.x - tipW / 2;
-  left = Math.max(margin, Math.min(window.innerWidth - tipW - margin, left));
+  let left = (screenPt.x - panelRect.left) - tipW / 2;
+  left = Math.max(margin, Math.min(panelRect.width - tipW - margin, left));
   tip.style.left = `${left}px`;
-  tip.style.top = `${screenPt.y - tipH - 14}px`;
+  tip.style.top = `${(screenPt.y - panelRect.top) - tipH - 14}px`;
 
   clearTimeout(dotTipTimer);
   dotTipTimer = setTimeout(() => { tip.hidden = true; }, 2200);
