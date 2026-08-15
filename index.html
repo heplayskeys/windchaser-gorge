@@ -169,7 +169,7 @@
   }
   .agreement .icon { font-size: 1rem; }
   .agreement .txt { font-size: 0.85rem; color: var(--text-mid); }
-  .agreement .txt b { color: var(--yellow); font-weight: 700; }
+  .agreement .txt b { color: var(--yellow); font-weight: 700; display: inline-block; margin-top: 0.25rem; }
 
   /* ---------- Gauge + glance ---------- */
   .section-divider { border: none; border-top: 1px solid var(--panel-line); margin: 0.9rem 0; }
@@ -373,8 +373,8 @@
     flex: 0 0 auto;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .live-current { display: flex; gap: 1.6rem; margin-bottom: 1rem; flex-wrap: wrap; min-height: 70px; }
-  .live-stat { position: relative; cursor: pointer; min-width: 82px; }
+  .live-current { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin-bottom: 1rem; min-height: 70px; }
+  .live-stat { position: relative; cursor: pointer; min-width: 0; }
   .live-stat .num { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.7rem; color: var(--text-hi); line-height: 1; }
   .stat-tip[hidden] { display: none; }
   .stat-tip {
@@ -418,8 +418,8 @@
     border-top-color: var(--panel-raised);
     z-index: 1;
   }
-  .live-stat .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.2rem; white-space: nowrap; }
-  .live-stat .sublbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; font-weight: 600; color: var(--yellow); white-space: nowrap; }
+  .live-stat .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .live-stat .sublbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; font-weight: 600; color: var(--yellow); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   svg.sparkline { width: 100%; height: auto; display: block; margin-top: 0.6rem; }
   .live-picker-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
   .live-currently-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.6rem; }
@@ -476,6 +476,20 @@
   .swatch.solid { background: var(--yellow); }
   .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
   .chart-point { cursor: pointer; }
+  .dot-tip[hidden] { display: none; }
+  .dot-tip {
+    position: fixed;
+    z-index: 40;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--yellow-ink);
+    background: var(--yellow);
+    border-radius: 6px;
+    padding: 0.3rem 0.55rem;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    white-space: nowrap;
+  }
   .outlook-modal-range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: 1rem; }
   .outlook-modal-range .unit { font-size: 1rem; font-family: 'IBM Plex Mono', monospace; margin-left: 0.4rem; color: var(--text-mid); }
   .outlook-modal-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
@@ -535,7 +549,10 @@ html.a11y .eyebrow { font-size: 0.85rem; }
 html.a11y h1 { font-size: clamp(2.4rem, 11vw, 3.2rem); }
 html.a11y .gauge-readout .range { font-size: clamp(2.9rem, 13vw, 3.8rem); }
 html.a11y .gauge-readout .call { font-size: 1.05rem; }
+html.a11y .live-current { grid-template-columns: repeat(2, 1fr); gap: 1rem 1.4rem; }
 html.a11y .live-stat .num { font-size: 2.1rem; }
+html.a11y .live-stat .lbl { font-size: 0.85rem; }
+html.a11y .live-stat .sublbl { font-size: 0.82rem; }
 html.a11y .zone-label, html.a11y .zone-value { font-size: 1rem; white-space: nowrap; }
 html.a11y .zone-label { flex: 0 0 108px; }
 html.a11y .zone-value { flex: 0 0 76px; }
@@ -663,6 +680,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
     <hr class="section-divider">
     <svg class="modal-chart" id="sparkline" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="modal-legend" id="sparkLegend"></div>
+    <div class="dot-tip" id="dotTip" hidden></div>
   </section>
 
   <div class="modal-overlay" id="outlookModal" hidden>
@@ -1507,6 +1525,15 @@ const LIVE_PERIOD_RANGES = {
   'Afternoon': [12, 17], 'Evening': [17, 21], 'Night': [21, 24],
 };
 
+function periodForHour(hour) {
+  if (hour < 5) return 'Night';
+  for (const period in LIVE_PERIOD_RANGES) {
+    const [start, end] = LIVE_PERIOD_RANGES[period];
+    if (hour >= start && hour < end) return period;
+  }
+  return 'Night';
+}
+
 async function selectLivePeriod(periodKey) {
   const myRequestId = ++liveRequestId;
   document.getElementById('liveLoading').hidden = false;
@@ -1519,40 +1546,57 @@ async function selectLivePeriod(periodKey) {
   renderStatsBlock(currentChartStartIdx, statsLabel(currentChartStartIdx));
 }
 
-function setupLiveRangePicker() {
-  const trigger = document.getElementById('liveRangeTrigger');
+function closeLiveRangeMenu() {
+  document.getElementById('liveRangeMenu').hidden = true;
+  document.getElementById('liveRangeTrigger').setAttribute('aria-expanded', 'false');
+}
+function openLiveRangeMenu() {
+  document.getElementById('liveRangeMenu').hidden = false;
+  document.getElementById('liveRangeTrigger').setAttribute('aria-expanded', 'true');
+}
+
+// 'Now' shrinks the chart to 13 closely-packed points, which works against
+// the accessible view's whole point (bigger, easier-to-read touch targets)
+// — so accessible mode only offers the named time segments, defaulting to
+// whichever one contains the current hour instead of 'Now'.
+function refreshLiveRangeOptions() {
   const label = document.getElementById('liveRangeTriggerLabel');
   const menu = document.getElementById('liveRangeMenu');
-  const options = ['Now', 'Dawn', 'Early', 'Morning', 'Afternoon', 'Evening', 'Night'];
+  const isA11y = document.documentElement.classList.contains('a11y');
+  const options = isA11y
+    ? ['Dawn', 'Early', 'Morning', 'Afternoon', 'Evening', 'Night']
+    : ['Now', 'Dawn', 'Early', 'Morning', 'Afternoon', 'Evening', 'Night'];
+  const defaultPeriod = isA11y ? periodForHour(new Date().getHours()) : 'Now';
 
   menu.innerHTML = options.map(p =>
-    `<button type="button" role="option" data-period="${p}" class="${p === 'Now' ? 'active' : ''}">${p}</button>`
+    `<button type="button" role="option" data-period="${p}" class="${p === defaultPeriod ? 'active' : ''}">${p}</button>`
   ).join('');
-
-  function closeMenu() {
-    menu.hidden = true;
-    trigger.setAttribute('aria-expanded', 'false');
-  }
-  function openMenu() {
-    menu.hidden = false;
-    trigger.setAttribute('aria-expanded', 'true');
-  }
-
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    menu.hidden ? openMenu() : closeMenu();
-  });
-  document.addEventListener('click', () => closeMenu());
-  menu.addEventListener('click', (e) => e.stopPropagation());
+  label.textContent = defaultPeriod;
 
   menu.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       menu.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
       label.textContent = btn.dataset.period;
-      closeMenu();
+      closeLiveRangeMenu();
       selectLivePeriod(btn.dataset.period);
     });
   });
+
+  return defaultPeriod;
+}
+
+function setupLiveRangePicker() {
+  const trigger = document.getElementById('liveRangeTrigger');
+  const menu = document.getElementById('liveRangeMenu');
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.hidden ? openLiveRangeMenu() : closeLiveRangeMenu();
+  });
+  document.addEventListener('click', () => closeLiveRangeMenu());
+  menu.addEventListener('click', (e) => e.stopPropagation());
+
+  refreshLiveRangeOptions();
 }
 
 function degToCompass(deg) {
@@ -1715,6 +1759,8 @@ function setupStatTooltips(container) {
 }
 document.addEventListener('click', () => {
   document.querySelectorAll('.stat-tip').forEach(t => t.hidden = true);
+  const dotTip = document.getElementById('dotTip');
+  if (dotTip) dotTip.hidden = true;
 });
 
 function renderLiveChart(periodKey) {
@@ -1747,7 +1793,8 @@ function renderLiveChart(periodKey) {
   // Real margins on all four sides so nothing (axis labels, the last hour
   // label, the 0kn tick) ever sits exactly on the viewBox edge, where it
   // gets clipped rather than just looking tight.
-  const w = 600, h = 260;
+  const isA11y = document.documentElement.classList.contains('a11y');
+  const w = 600, h = isA11y ? 340 : 260;
   const leftPad = 38, rightPad = 22, topPad = 14, bottomPad = 30;
   const max = Math.max(30, ...speeds, ...gusts);
   const plotW = w - leftPad - rightPad;
@@ -1755,6 +1802,14 @@ function renderLiveChart(periodKey) {
   const step = speeds.length > 1 ? plotW / (speeds.length - 1) : 0;
   const x = i => leftPad + i * step;
   const yOf = v => topPad + plotH - (v / max) * plotH;
+
+  // Fewer points on screen (named-period views) means more room per point,
+  // so those dots can afford to be noticeably bigger without crowding —
+  // accessible mode bumps this further for easier touch targets.
+  const dotR = (speeds.length <= 5 ? 7 : 5) + (isA11y ? 2 : 0);
+  const hitR = (speeds.length <= 5 ? 20 : 15) + (isA11y ? 4 : 0);
+  const axisFontSize = isA11y ? 14 : 10;
+  const tickFontSize = isA11y ? 15 : 11;
 
   const speedPts = speeds.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
   const gustPts = gusts.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
@@ -1769,7 +1824,7 @@ function renderLiveChart(periodKey) {
     const anchor = i === speeds.length - 1 ? 'end' : i === 0 ? 'start' : 'middle';
     const globalIdx = startIdx + i;
     const label = globalIdx === liveNowIdx ? `Now (${formatHourLabel(times[i])})` : formatHourLabel(times[i]);
-    return `<text x="${x(i)}" y="${h - 8}" font-size="10" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace" text-anchor="${anchor}">${label}</text>`;
+    return `<text x="${x(i)}" y="${h - 8}" font-size="${axisFontSize}" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace" text-anchor="${anchor}">${label}</text>`;
   }).join('');
 
   spark.setAttribute('viewBox', `0 0 ${w} ${h}`);
@@ -1781,11 +1836,11 @@ function renderLiveChart(periodKey) {
     ${ticks.map(v => {
       const y = yOf(v);
       return `<line x1="${leftPad}" y1="${y}" x2="${w - rightPad}" y2="${y}" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3,4"/>
-              <text x="0" y="${y + 4}" font-size="11" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace">${v}kn</text>`;
+              <text x="0" y="${y + 4}" font-size="${tickFontSize}" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace">${v}kn</text>`;
     }).join('')}
     <polyline points="${gustPts}" fill="none" stroke="var(--text-low)" stroke-width="1.6" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round"></polyline>
     <polyline points="${speedPts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
-    ${speeds.map((s, i) => `<g class="chart-point" data-idx="${startIdx + i}"><circle cx="${x(i)}" cy="${yOf(s)}" r="15" fill="#000" fill-opacity="0.01" pointer-events="all"></circle><circle cx="${x(i)}" cy="${yOf(s)}" r="5" fill="${windBand(s).color}" stroke="var(--bg)" stroke-width="1.5" pointer-events="none"></circle></g>`).join('')}
+    ${speeds.map((s, i) => `<g class="chart-point" data-idx="${startIdx + i}"><circle cx="${x(i)}" cy="${yOf(s)}" r="${hitR}" fill="#000" fill-opacity="0.01" pointer-events="all"></circle><circle cx="${x(i)}" cy="${yOf(s)}" r="${dotR}" fill="${windBand(s).color}" stroke="var(--bg)" stroke-width="1.5" pointer-events="none"></circle></g>`).join('')}
     ${hourLabels}
   `;
   legend.innerHTML = `
@@ -1798,8 +1853,31 @@ function renderLiveChart(periodKey) {
       e.stopPropagation();
       const idx = parseInt(g.dataset.idx, 10);
       renderStatsBlock(idx, statsLabel(idx));
+      showDotTip(spark, g, idx === liveNowIdx ? 'Now' : formatHourLabel(lastLiveData.hourly.time[idx]));
     });
   });
+}
+
+let dotTipTimer = null;
+function showDotTip(svg, pointEl, text) {
+  const tip = document.getElementById('dotTip');
+  const dot = pointEl.querySelectorAll('circle')[1]; // the small visible dot, not the hit target
+  const pt = svg.createSVGPoint();
+  pt.x = parseFloat(dot.getAttribute('cx'));
+  pt.y = parseFloat(dot.getAttribute('cy'));
+  const screenPt = pt.matrixTransform(svg.getScreenCTM());
+
+  tip.textContent = text;
+  tip.hidden = false;
+
+  const tipW = tip.offsetWidth, tipH = tip.offsetHeight, margin = 10;
+  let left = screenPt.x - tipW / 2;
+  left = Math.max(margin, Math.min(window.innerWidth - tipW - margin, left));
+  tip.style.left = `${left}px`;
+  tip.style.top = `${screenPt.y - tipH - 14}px`;
+
+  clearTimeout(dotTipTimer);
+  dotTipTimer = setTimeout(() => { tip.hidden = true; }, 2200);
 }
 
 function drawTicks(svg) {
@@ -1947,7 +2025,7 @@ function renderAgreement(zones) {
   wrap.innerHTML = `
     <div class="agreement">
       <span class="icon">🎯</span>
-      <span class="txt">Today's best ${closest.length > 1 ? 'spots' : 'spot'} for ${PREFERRED_KN}kn lovers: <b>${joinWithAmpersand(closest)}</b></span>
+      <span class="txt">Today's best ${closest.length > 1 ? 'spots' : 'spot'} for ${PREFERRED_KN}kn lovers:<br><b>${joinWithAmpersand(closest)}</b></span>
     </div>`;
 }
 
@@ -2294,6 +2372,11 @@ function setA11yMode(on) {
   btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   btn.innerHTML = on ? ICON_ZOOM_OUT : ICON_ZOOM_IN;
   try { localStorage.setItem('gorgeA11yMode', on ? '1' : '0'); } catch (e) {}
+
+  if (lastLiveData) {
+    const newDefaultPeriod = refreshLiveRangeOptions();
+    selectLivePeriod(newDefaultPeriod);
+  }
 }
 document.getElementById('a11yToggle').addEventListener('click', () => {
   setA11yMode(!document.documentElement.classList.contains('a11y'));
