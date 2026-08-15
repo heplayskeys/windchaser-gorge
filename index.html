@@ -476,7 +476,7 @@
   .swatch.solid { background: var(--yellow); }
   .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
   .chart-point { cursor: pointer; }
-  .chart-hint { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; font-weight: 600; color: var(--yellow); margin-bottom: 0.5rem; }
+  .chart-hint { font-family: 'IBM Plex Mono', monospace; font-size: clamp(0.56rem, 2.5vw, 0.74rem); font-weight: 600; color: var(--yellow); text-align: center; white-space: nowrap; margin-top: 0.8rem; }
   .dot-tip[hidden] { display: none; }
   .dot-tip {
     position: absolute;
@@ -554,7 +554,7 @@ html.a11y .live-current { grid-template-columns: repeat(2, 1fr); gap: 1rem 1.4re
 html.a11y .live-stat .num { font-size: 2.1rem; }
 html.a11y .live-stat .lbl { font-size: 0.85rem; }
 html.a11y .live-stat .sublbl { font-size: 0.82rem; }
-html.a11y .chart-hint { font-size: 0.92rem; }
+html.a11y .chart-hint { font-size: clamp(0.66rem, 3vw, 0.92rem); }
 html.a11y .zone-label, html.a11y .zone-value { font-size: 1rem; white-space: nowrap; }
 html.a11y .zone-label { flex: 0 0 108px; }
 html.a11y .zone-value { flex: 0 0 76px; }
@@ -680,9 +680,9 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
     <div class="live-currently-label" id="liveCurrentlyLabel">Conditions at:</div>
     <div class="live-current" id="liveCurrent"></div>
     <hr class="section-divider">
-    <div class="chart-hint">Tap any dot for conditions at that hour</div>
     <svg class="modal-chart" id="sparkline" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
     <div class="modal-legend" id="sparkLegend"></div>
+    <div class="chart-hint">Tap any data point for conditions on the hour</div>
     <div class="dot-tip" id="dotTip" hidden></div>
   </section>
 
