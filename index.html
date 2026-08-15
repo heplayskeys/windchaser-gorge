@@ -57,6 +57,21 @@
 
   header { padding-top: max(1.5rem, env(safe-area-inset-top)); }
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.13em; color: var(--text-low); text-transform: uppercase; }
+  .header-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  .a11y-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mid);
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 999px;
+    padding: 0.45rem;
+    min-height: 36px;
+    min-width: 36px;
+    cursor: pointer;
+  }
+  .a11y-toggle[aria-pressed="true"] { background: var(--yellow); color: var(--yellow-ink); border-color: var(--yellow); }
   h1 {
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 800;
@@ -68,17 +83,24 @@
   h1 span { color: var(--yellow); }
   #updated { font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; color: var(--text-low); margin-top: 0.4rem; }
 
-  /* ---------- Segmented-control nav: fits all items, never scrolls ---------- */
+  /* ---------- Segmented-control nav: full-width bar, fits all items, never scrolls ---------- */
   .navbar {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: var(--bg);
-    padding: 0.9rem 0;
+    width: 100%;
     margin-top: 1.2rem;
+    background: var(--panel);
+    border-top: 1px solid var(--panel-line);
     border-bottom: 1px solid var(--panel-line);
   }
-  .segmented { display: flex; gap: 3px; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 12px; padding: 4px; }
+  .segmented {
+    display: flex;
+    gap: 3px;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0.6rem max(1.15rem, env(safe-area-inset-right)) 0.6rem max(1.15rem, env(safe-area-inset-left));
+  }
   .segmented a {
     flex: 1;
     min-width: 0;
@@ -103,7 +125,35 @@
   section { scroll-margin-top: 5rem; }
 
   /* ---------- Badges ---------- */
-  .badges { display: flex; flex-wrap: wrap; gap: 0.45rem; padding: 0.9rem 0 0; }
+  .conditions-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.9rem; margin-bottom: 0.4rem; }
+  .conditions-scroll-wrap { position: relative; }
+  .badges {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  .badges::-webkit-scrollbar { display: none; }
+  .cond-chevron {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    color: var(--text-hi);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 5;
+  }
+  .cond-chevron-right { right: 0; background: linear-gradient(to right, transparent, var(--bg) 60%); justify-content: flex-end; }
+  .cond-chevron-left { left: 0; background: linear-gradient(to left, transparent, var(--bg) 60%); justify-content: flex-start; }
+  .cond-chevron[hidden] { display: none; }
   .badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.65rem; border-radius: 5px; }
   .badge.caution { background: var(--yellow); color: var(--yellow-ink); }
   .badge.warning { background: var(--red); color: var(--red-ink); }
@@ -123,11 +173,11 @@
 
   /* ---------- Gauge + glance ---------- */
   .section-divider { border: none; border-top: 1px solid var(--panel-line); margin: 0.9rem 0; }
-  .glance { display: flex; align-items: center; gap: 1.5rem; padding: 1.4rem 0 0.4rem; flex-wrap: wrap; }
+  .glance { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 1.4rem 0 0.4rem; flex-wrap: wrap; }
 
-  .gauge { flex: 0 0 auto; width: 120px; height: 120px; }
-  .gauge-readout { flex: 1 1 200px; }
-  .gauge-readout .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(2.2rem, 10vw, 2.9rem); color: var(--yellow); line-height: 1; }
+  .gauge { flex: 0 0 auto; width: 132px; height: 132px; }
+  .gauge-readout { flex: 0 1 auto; }
+  .gauge-readout .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.1rem); color: var(--yellow); line-height: 1; }
   .gauge-readout .range span { display: block; font-size: 0.42em; color: var(--text-mid); font-family: 'IBM Plex Mono', monospace; font-weight: 500; margin-top: 0.25rem; letter-spacing: 0.02em; }
   .gauge-readout .call { margin-top: 0.5rem; font-size: 0.98rem; color: var(--text-mid); line-height: 1.5; }
   .gauge-readout .call strong { color: var(--text-hi); font-weight: 700; }
@@ -194,6 +244,8 @@
   .skull-swatch { width: auto; height: auto; font-size: 0.75rem; line-height: 1; background: none !important; }
 
   .outlook-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
+  .outlook-row-bottom { grid-template-columns: repeat(3, 1fr); max-width: 75%; margin: 0.4rem auto 0; }
+  .outlook-row-bottom:empty { display: none; margin: 0; }
   .outlook-day {
     min-height: 108px;
     display: flex;
@@ -204,7 +256,10 @@
     border-radius: 9px;
     padding: 0.6rem 0.2rem;
     text-align: center;
+    cursor: pointer;
+    font: inherit;
   }
+  .outlook-day.empty { cursor: default; }
   .outlook-day .dname { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap { display: flex; align-items: center; justify-content: center; gap: 0.2rem; margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; }
@@ -235,6 +290,7 @@
     overflow: hidden;
     white-space: nowrap;
     opacity: 0;
+    margin-left: 0;
     transition: max-width 0.22s ease, opacity 0.18s ease, margin-left 0.22s ease;
   }
   .pill.expanded .pill-label { max-width: 160px; opacity: 1; margin-left: 0.35rem; }
@@ -246,42 +302,140 @@
   }
   .pill.flag-pill.caution { border-color: var(--yellow); color: var(--yellow); }
   .pill.flag-pill.warning { border-color: var(--red); color: var(--red); }
-  .chip-pop-body {
+
+  .live-location-picker { position: relative; margin-top: 0.7rem; margin-bottom: 0.3rem; display: inline-block; }
+  .live-location-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--yellow-ink);
+    background: var(--yellow);
+    border: none;
+    border-radius: 999px;
+    padding: 0.5rem 0.85rem;
+    min-height: 36px;
+    cursor: pointer;
+  }
+  .trigger-chevron { transition: transform 0.18s ease; flex: 0 0 auto; }
+  .live-location-trigger[aria-expanded="true"] .trigger-chevron { transform: rotate(180deg); }
+  .live-location-menu[hidden] { display: none; }
+  .live-location-menu {
     position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.74rem;
-    font-weight: 500;
-    color: var(--text-hi);
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     background: var(--panel-raised);
     border: 1px solid var(--panel-line);
-    border-radius: 6px;
-    padding: 0.5rem 0.7rem;
-    width: max-content;
-    max-width: 200px;
-    white-space: normal;
+    border-radius: 10px;
+    padding: 5px;
+    min-width: 160px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .live-location-menu button {
+    display: block;
+    width: 100%;
     text-align: left;
-    line-height: 1.6;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
-    z-index: 30;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--text-mid);
+    background: none;
+    border: none;
+    border-radius: 7px;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
   }
-  .chip-pop-body[hidden] { display: none; }
-  .chip-pop-body::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: var(--panel-line);
+  .live-location-menu button.active { background: var(--yellow); color: var(--yellow-ink); }
+  .live-location-menu button:not(.active):hover { background: var(--panel); color: var(--text-hi); }
+  .live-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text-low);
+    min-height: 52px;
   }
-
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--panel-line);
+    border-top-color: var(--yellow);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex: 0 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
   .live-current { display: flex; gap: 1.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
   .live-stat .num { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.7rem; color: var(--text-hi); line-height: 1; }
   .live-stat .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.2rem; }
+  .trend-arrow { font-weight: 700; }
+  .trend-building { color: var(--green); }
+  .trend-dropping { color: var(--red); }
+  .trend-steady { color: var(--text-low); }
   svg.sparkline { width: 100%; height: 64px; display: block; }
   .spark-caption { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); margin-top: 0.5rem; display: flex; justify-content: space-between; }
+  .live-chart-tap {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .expand-hint { color: var(--yellow); }
+  .modal-overlay[hidden] { display: none; }
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(0,0,0,0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem;
+  }
+  .modal-card {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 14px;
+    padding: 1.2rem;
+    width: 100%;
+    max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
+  .modal-header h3 { font-family: 'Big Shoulders Display', sans-serif; font-size: 1.15rem; text-transform: uppercase; color: var(--text-hi); }
+  .modal-close {
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    color: var(--text-mid);
+    border-radius: 7px;
+    width: 34px; height: 34px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .modal-chart { width: 100%; height: auto; }
+  .modal-legend { display: flex; gap: 1.2rem; margin-top: 0.6rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.74rem; color: var(--text-mid); }
+  .legend-item { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .legend-item .swatch { width: 16px; height: 2px; display: inline-block; }
+  .legend-item .swatch.solid { background: var(--yellow); }
+  .legend-item .swatch.dashed { background: repeating-linear-gradient(to right, var(--text-low) 0 3px, transparent 3px 6px); }
+  .outlook-modal-range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 2.6rem; line-height: 1; margin-bottom: 1rem; }
+  .outlook-modal-range .unit { font-size: 1rem; font-family: 'IBM Plex Mono', monospace; margin-left: 0.4rem; color: var(--text-mid); }
+  .outlook-modal-row { display: flex; justify-content: space-between; padding: 0.6rem 0; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; }
+  .outlook-modal-row .lbl { color: var(--text-low); }
+  .outlook-modal-row .val { color: var(--text-hi); font-weight: 600; }
+  .outlook-modal-zones-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--panel-line); }
+  .outlook-modal-note { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; color: var(--text-low); line-height: 1.5; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--panel-line); }
 
   /* ---------- Source cards — each one is a plain link to the original site ---------- */
   .sources { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.4rem; }
@@ -324,6 +478,39 @@
     .card:nth-child(2) { animation-delay: 0.06s; }
   }
   @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+/* ---------- Accessible view — higher contrast, larger text, bigger tap
+   targets, reduced motion. Applied as an override layer on the SAME
+   layout/content (not a separate page), so the two modes can never drift
+   out of sync with each other. ---------- */
+html.a11y { --text-mid: #EAF0F4; --text-low: #C9D4DA; }
+html.a11y body { font-size: 18px; line-height: 1.55; }
+html.a11y .eyebrow { font-size: 0.85rem; }
+html.a11y h1 { font-size: clamp(2.4rem, 11vw, 3.2rem); }
+html.a11y .gauge-readout .range { font-size: clamp(2.9rem, 13vw, 3.8rem); }
+html.a11y .gauge-readout .call { font-size: 1.05rem; }
+html.a11y .live-stat .num { font-size: 2.1rem; }
+html.a11y .zone-label, html.a11y .zone-value { font-size: 1rem; white-space: nowrap; }
+html.a11y .zone-label { flex: 0 0 108px; }
+html.a11y .zone-value { flex: 0 0 76px; }
+html.a11y .zone-track { flex: 0.6 1 auto; }
+html.a11y h2 { font-size: 1.5rem; }
+html.a11y .agreement .txt { font-size: 1.05rem; }
+html.a11y .zone-kite, html.a11y .zone-kite-header, html.a11y .zone-caption-row { display: none; }
+html.a11y .sub, html.a11y .credibility, html.a11y .pill, html.a11y .segmented a,
+html.a11y .outlook-day .range, html.a11y .live-loading, html.a11y .badge {
+  font-size: 0.95rem;
+}
+html.a11y .segmented a, html.a11y .pill, html.a11y .period-buttons button,
+html.a11y .outlook-day, html.a11y .live-location-trigger, html.a11y .card,
+html.a11y .modal-close, html.a11y .a11y-toggle {
+  min-height: 46px;
+}
+html.a11y .pill { padding: 0.5rem 0.8rem; }
+html.a11y *, html.a11y *::before, html.a11y *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
 </style>
 </head>
 <body>
@@ -331,12 +518,15 @@
 <div class="wrap">
 <header>
   <div class="eyebrow">Columbia River Gorge · Kite &amp; Wind Conditions</div>
-  <h1>Today's <span>Wind</span></h1>
+  <div class="header-top-row">
+    <h1>Today's <span>Wind</span></h1>
+    <button type="button" id="a11yToggle" class="a11y-toggle" aria-pressed="false" aria-label="Toggle accessible view"><svg viewBox="0 0 24 24" width="19" height="19"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
   <div id="updated">Loading latest readings…</div>
 </header>
 </div>
 
-<div class="navbar wrap">
+<div class="navbar">
   <div class="segmented">
     <a href="#glance" class="active">Glance</a>
     <a href="#zones">Zones</a>
@@ -347,7 +537,14 @@
 </div>
 
 <div class="wrap">
-  <div class="badges" id="badgesWrap"></div>
+  <div class="conditions-section" id="conditionsSection" hidden>
+    <div class="conditions-label">Conditions (tap for details):</div>
+    <div class="conditions-scroll-wrap">
+      <button class="cond-chevron cond-chevron-left" id="condChevronLeft" hidden aria-label="Scroll left">‹</button>
+      <div class="badges" id="badgesWrap"></div>
+      <button class="cond-chevron cond-chevron-right" id="condChevronRight" hidden aria-label="Scroll right">›</button>
+    </div>
+  </div>
 
   <hr class="section-divider">
   <div id="agreementWrap"></div>
@@ -386,17 +583,49 @@
 
   <section id="outlook" class="panel">
     <h2>7-Day Outlook</h2>
-    <div class="sub">From Temira's longer-term forecast · arrows show wind direction</div>
-    <div id="outlookRow" class="outlook-row"></div>
+    <div class="sub">A quick look at wind trends for the week ahead</div>
+    <div id="outlookRowTop" class="outlook-row"></div>
+    <div id="outlookRowBottom" class="outlook-row outlook-row-bottom"></div>
   </section>
 
   <section id="live" class="panel">
     <h2>Live Model Data</h2>
-    <div class="sub" id="liveSub">Hood River, OR · Open-Meteo forecast model</div>
+    <div class="sub" id="liveSub">Swell City, OR · Open-Meteo forecast model</div>
+    <div class="live-location-picker">
+      <button type="button" id="liveLocationTrigger" class="live-location-trigger" aria-haspopup="listbox" aria-expanded="false">
+        <span id="liveLocationTriggerLabel">Swell City</span>
+        <svg class="trigger-chevron" viewBox="0 0 24 24" width="14" height="14"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div id="liveLocationMenu" class="live-location-menu" role="listbox" hidden></div>
+    </div>
+    <div class="live-loading" id="liveLoading" hidden><span class="spinner"></span>Loading…</div>
     <div class="live-current" id="liveCurrent"></div>
-    <svg class="sparkline" id="sparkline" viewBox="0 0 300 64" preserveAspectRatio="none"></svg>
-    <div class="spark-caption"><span>Now</span><span id="sparkEnd">+12h</span></div>
+    <button type="button" class="live-chart-tap" id="liveChartTap" aria-label="Enlarge wind speed chart">
+      <svg class="sparkline" id="sparkline" viewBox="0 0 300 64" preserveAspectRatio="none"></svg>
+    </button>
+    <div class="spark-caption"><span>Now</span><span class="expand-hint">Tap chart for detailed view ⤢</span><span id="sparkEnd">+12h</span></div>
   </section>
+
+  <div class="modal-overlay" id="liveModal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="liveModalTitle">Wind speed</h3>
+        <button type="button" class="modal-close" id="liveModalClose" aria-label="Close">✕</button>
+      </div>
+      <svg class="modal-chart" id="liveModalSpark" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="modal-legend" id="liveModalLegend"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="outlookModal" hidden>
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="outlookModalTitle">Day</h3>
+        <button type="button" class="modal-close" id="outlookModalClose" aria-label="Close">✕</button>
+      </div>
+      <div id="outlookModalBody"></div>
+    </div>
+  </div>
 
   <section id="sources" class="sources"></section>
 
@@ -478,42 +707,24 @@ function titleCase(str) {
 
 function flagHTML(f) {
   const icon = FLAG_ICONS[f.label] || '⚠️';
-  const whereText = f.where ? f.where.split(', ').map(titleCase).join('<br>') : 'Applies generally today';
-  return `<span class="chip-pop">
-    <button type="button" class="pill flag-pill ${f.level}">
-      <span class="pill-icon">${icon}</span><span class="pill-label">${f.label}</span>
-    </button>
-    <span class="chip-pop-body" hidden>${whereText}</span>
-  </span>`;
+  return `<button type="button" class="pill flag-pill ${f.level}">
+    <span class="pill-icon">${icon}</span><span class="pill-label">${f.label}</span>
+  </button>`;
 }
 
-// Tap opens the tooltip; it auto-dismisses after ~2.5s, or immediately if
-// tapped again. Opening one closes any other open tooltip.
-function setupTooltipDismiss(root) {
-  root.querySelectorAll('.chip-pop').forEach(cp => {
-    const btn = cp.querySelector('.pill');
-    const body = cp.querySelector('.chip-pop-body');
-    if (!btn || !body || btn.dataset.tooltipWired) return;
-    btn.dataset.tooltipWired = '1';
-    let timer = null;
+// Tap toggles this pill's label open/closed (icon -> icon+label). Accordion:
+// opening one collapses whichever other pill was open. No tooltip, no
+// extra content pushed into the page flow — this only changes the pill's
+// own width within the fixed-height scroll row, so it never shifts layout.
+function setupConditionPills(root) {
+  root.querySelectorAll('.pill.flag-pill').forEach(btn => {
+    if (btn.dataset.wired) return;
+    btn.dataset.wired = '1';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const wasExpanded = btn.classList.contains('expanded');
-      // accordion: collapse/hide every other pill first
       document.querySelectorAll('.pill.expanded').forEach(b => { if (b !== btn) b.classList.remove('expanded'); });
-      document.querySelectorAll('.chip-pop-body').forEach(b => { if (b !== body) b.setAttribute('hidden', ''); });
-      clearTimeout(timer);
-      if (wasExpanded) {
-        // tapped the already-expanded pill again — collapse it fully
-        btn.classList.remove('expanded');
-        body.setAttribute('hidden', '');
-      } else {
-        btn.classList.add('expanded');
-        body.removeAttribute('hidden');
-        // tooltip itself auto-hides after 2.5s, but the pill stays
-        // expanded (label visible) until tapped again or another pill opens
-        timer = setTimeout(() => body.setAttribute('hidden', ''), 2500);
-      }
+      btn.classList.toggle('expanded', !wasExpanded);
     });
   });
 }
@@ -1117,18 +1328,122 @@ async function loadData() {
 // NOTE: this won't run inside Claude's in-chat preview sandbox, which blocks
 // outbound network requests. It works fine once hosted on a real domain
 // (e.g. GitHub Pages) — Open-Meteo supports CORS for direct browser calls.
-async function loadLive() {
-  const lat = 45.7133, lon = -121.5254;
+//
+// Coordinates are approximate (general knowledge of these towns' locations
+// along the Gorge, not surveyed) — good enough for a model forecast point,
+// but nudge them if you know a more precise spot for a given zone.
+const LIVE_LOCATIONS = [
+  { name: 'Swell City, OR', lat: 45.7133, lon: -121.5254 },
+  { name: 'Stevenson, WA', lat: 45.6976, lon: -121.8934 },
+  { name: 'Viento, OR', lat: 45.7025, lon: -121.6660 },
+  { name: 'Mosier, OR', lat: 45.6821, lon: -121.3971 },
+  { name: 'The Dalles, OR', lat: 45.5946, lon: -121.1787 },
+  { name: 'Lyle, WA', lat: 45.6960, lon: -121.2860 },
+  { name: 'Rufus, OR', lat: 45.6748, lon: -120.7256 },
+  { name: 'Arlington, OR', lat: 45.7168, lon: -120.2103 },
+];
+
+const LIVE_CACHE_TTL_MS = 12 * 60 * 60 * 1000; // matches the 12h sparkline window
+
+function getCachedLive(lat, lon) {
+  try {
+    const raw = sessionStorage.getItem(`live_${lat}_${lon}`);
+    if (!raw) return null;
+    const { data, timestamp } = JSON.parse(raw);
+    if (Date.now() - timestamp > LIVE_CACHE_TTL_MS) return null;
+    return data;
+  } catch (e) {
+    return null; // sessionStorage unavailable or corrupted entry — just refetch
+  }
+}
+
+function setCachedLive(lat, lon, data) {
+  try {
+    sessionStorage.setItem(`live_${lat}_${lon}`, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch (e) {
+    // sessionStorage full/unavailable — fine, just means no caching this time
+  }
+}
+
+async function loadLive(lat, lon) {
+  const cached = getCachedLive(lat, lon);
+  if (cached) return cached;
+
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&hourly=wind_speed_10m,wind_direction_10m&current=temperature_2m,wind_speed_10m,wind_direction_10m` +
+    `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m&current=temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m` +
     `&wind_speed_unit=kn&temperature_unit=fahrenheit&timezone=auto&forecast_days=1`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error('open-meteo unavailable');
-    return await res.json();
+    const data = await res.json();
+    setCachedLive(lat, lon, data);
+    return data;
   } catch (e) {
     return null;
   }
+}
+
+function setupLiveLocationPicker() {
+  const trigger = document.getElementById('liveLocationTrigger');
+  const label = document.getElementById('liveLocationTriggerLabel');
+  const menu = document.getElementById('liveLocationMenu');
+
+  menu.innerHTML = LIVE_LOCATIONS.map((l, i) => {
+    const shortName = l.name.split(',')[0];
+    return `<button type="button" role="option" data-idx="${i}" class="${i === 0 ? 'active' : ''}">${shortName}</button>`;
+  }).join('');
+
+  function closeMenu() {
+    menu.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false');
+  }
+  function openMenu() {
+    menu.hidden = false;
+    trigger.setAttribute('aria-expanded', 'true');
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.hidden ? openMenu() : closeMenu();
+  });
+  document.addEventListener('click', () => closeMenu());
+  menu.addEventListener('click', (e) => e.stopPropagation());
+
+  menu.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      menu.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      const loc = LIVE_LOCATIONS[btn.dataset.idx];
+      label.textContent = loc.name.split(',')[0];
+      closeMenu();
+      selectLiveLocation(loc);
+    });
+  });
+}
+
+// Tracks the most recently requested location so a slow-resolving fetch
+// from an earlier tap can never overwrite a faster one from a later tap —
+// rapid clicking always ends up showing whichever location was tapped LAST,
+// not whichever network response happens to arrive last.
+let liveRequestId = 0;
+
+async function selectLiveLocation(loc) {
+  const myRequestId = ++liveRequestId;
+
+  document.getElementById('liveCurrent').innerHTML = '';
+  document.getElementById('sparkline').innerHTML = '';
+  document.getElementById('liveLoading').hidden = false;
+
+  // A small minimum delay so the loading state is visibly consistent
+  // whether this is a fresh network fetch or an instant cache hit —
+  // otherwise cached taps would flash by while fresh ones visibly load,
+  // which reads as inconsistent/glitchy.
+  const minDelay = new Promise(resolve => setTimeout(resolve, 280));
+  const [data] = await Promise.all([loadLive(loc.lat, loc.lon), minDelay]);
+
+  if (myRequestId !== liveRequestId) return; // superseded by a newer tap — discard this stale result
+
+  document.getElementById('liveLoading').hidden = true;
+  renderLive(data, loc.name);
 }
 
 function degToCompass(deg) {
@@ -1136,7 +1451,9 @@ function degToCompass(deg) {
   return dirs[Math.round(deg / 22.5) % 16];
 }
 
-function renderLive(data) {
+let lastLiveData = null, lastLiveLocationName = '';
+
+function renderLive(data, locationName) {
   const currentWrap = document.getElementById('liveCurrent');
   const spark = document.getElementById('sparkline');
   const sub = document.getElementById('liveSub');
@@ -1148,25 +1465,117 @@ function renderLive(data) {
     return;
   }
 
+  lastLiveData = data;
+  lastLiveLocationName = locationName;
+
+  sub.textContent = `${locationName || 'Swell City, OR'} · Open-Meteo forecast model`;
   const c = data.current;
+  const speeds = (data.hourly && data.hourly.wind_speed_10m || []).slice(0, 13);
+
+  // Gust factor: how much higher gusts run above sustained wind. Kiteboarding
+  // guidance generally treats a 10+kn gap as choppy/unstable conditions.
+  const gustGap = Math.round(c.wind_gusts_10m - c.wind_speed_10m);
+  const steadiness = gustGap >= 10 ? 'Gusty' : gustGap >= 5 ? 'Some gusts' : 'Steady';
+
+  // Trend: average of the next 3 forecast hours vs right now.
+  let trendLabel = '', trendArrow = '';
+  if (speeds.length >= 4) {
+    const next3Avg = (speeds[1] + speeds[2] + speeds[3]) / 3;
+    const diff = next3Avg - speeds[0];
+    if (diff >= 3) { trendLabel = 'Building'; trendArrow = '↑'; }
+    else if (diff <= -3) { trendLabel = 'Dropping'; trendArrow = '↓'; }
+    else { trendLabel = 'Steady'; trendArrow = '→'; }
+  }
+
   currentWrap.innerHTML = `
-    <div class="live-stat"><div class="num">${Math.round(c.wind_speed_10m)}</div><div class="lbl">KN NOW</div></div>
+    <div class="live-stat"><div class="num">${Math.round(c.wind_speed_10m)}</div><div class="lbl">KN NOW ${trendArrow ? `<span class="trend-arrow trend-${trendLabel.toLowerCase()}">${trendArrow}</span>` : ''}</div></div>
+    <div class="live-stat"><div class="num">${Math.round(c.wind_gusts_10m)}</div><div class="lbl">GUST · ${steadiness}</div></div>
     <div class="live-stat"><div class="num">${degToCompass(c.wind_direction_10m)}</div><div class="lbl">DIRECTION</div></div>
     <div class="live-stat"><div class="num">${Math.round(c.temperature_2m)}°</div><div class="lbl">TEMP F</div></div>
   `;
 
-  const speeds = (data.hourly && data.hourly.wind_speed_10m || []).slice(0, 13);
   if (!speeds.length) { spark.innerHTML = ''; return; }
+  drawSparkline(spark, speeds, 300, 64, true);
+}
 
+// axisPad reserves left margin for the Y-axis value labels — used by both
+// the compact inline sparkline and the larger modal chart, just with
+// different canvas sizes, so the tick math stays in one place.
+function drawSparkline(svg, speeds, w, h, showAxis) {
+  const axisPad = showAxis ? 22 : 0;
+  const plotW = w - axisPad;
   const max = Math.max(30, ...speeds);
-  const w = 300, h = 64, step = w / (speeds.length - 1);
-  const points = speeds.map((s, i) => `${i * step},${h - (s / max) * h}`).join(' ');
-  const fillPoints = `0,${h} ` + points + ` ${w},${h}`;
-  spark.innerHTML = `
+  const step = plotW / (speeds.length - 1);
+  const x = i => axisPad + i * step;
+  const points = speeds.map((s, i) => `${x(i)},${h - (s / max) * h}`).join(' ');
+  const fillPoints = `${axisPad},${h} ` + points + ` ${w},${h}`;
+
+  let axisHTML = '';
+  if (showAxis) {
+    const ticks = [0, Math.round(max / 2), Math.round(max)];
+    axisHTML = ticks.map(v => {
+      const y = h - (v / max) * h;
+      return `<line x1="${axisPad}" y1="${y}" x2="${w}" y2="${y}" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="2,3"/>
+              <text x="0" y="${y + 3}" font-size="9" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace">${v}</text>`;
+    }).join('');
+  }
+
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.innerHTML = `
+    ${axisHTML}
     <polyline points="${fillPoints}" fill="rgba(255,201,60,0.12)" stroke="none"></polyline>
     <polyline points="${points}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
-    ${speeds.map((s, i) => `<circle cx="${i * step}" cy="${h - (s / max) * h}" r="2.5" fill="${windBand(s).color}"></circle>`).join('')}
+    ${speeds.map((s, i) => `<circle cx="${x(i)}" cy="${h - (s / max) * h}" r="2.5" fill="${windBand(s).color}"></circle>`).join('')}
   `;
+}
+
+function openLiveModal() {
+  if (!lastLiveData || !lastLiveData.hourly) return;
+  const modal = document.getElementById('liveModal');
+  const modalSpark = document.getElementById('liveModalSpark');
+  const modalTitle = document.getElementById('liveModalTitle');
+  const modalLegend = document.getElementById('liveModalLegend');
+
+  modalTitle.textContent = `${lastLiveLocationName || 'Live'} · Wind speed, 12h`;
+  const speeds = (lastLiveData.hourly.wind_speed_10m || []).slice(0, 13);
+  const gusts = (lastLiveData.hourly.wind_gusts_10m || []).slice(0, 13);
+
+  const w = 600, h = 260, axisPad = 34;
+  const max = Math.max(30, ...speeds, ...gusts);
+  const plotW = w - axisPad;
+  const step = plotW / (speeds.length - 1);
+  const x = i => axisPad + i * step;
+  const yOf = v => h - (v / max) * (h - 20);
+
+  const speedPts = speeds.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
+  const gustPts = gusts.map((s, i) => `${x(i)},${yOf(s)}`).join(' ');
+  const ticks = [0, Math.round(max / 2), Math.round(max)];
+  const hourLabels = speeds.map((_, i) => {
+    if (i % 3 !== 0) return '';
+    return `<text x="${x(i)}" y="${h - 2}" font-size="10" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace" text-anchor="middle">${i === 0 ? 'Now' : '+' + i + 'h'}</text>`;
+  }).join('');
+
+  modalSpark.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  modalSpark.innerHTML = `
+    ${ticks.map(v => {
+      const y = yOf(v);
+      return `<line x1="${axisPad}" y1="${y}" x2="${w}" y2="${y}" stroke="var(--panel-line)" stroke-width="1" stroke-dasharray="3,4"/>
+              <text x="0" y="${y + 4}" font-size="11" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace">${v}kn</text>`;
+    }).join('')}
+    <polyline points="${gustPts}" fill="none" stroke="var(--text-low)" stroke-width="1.6" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    <polyline points="${speedPts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
+    ${speeds.map((s, i) => `<circle cx="${x(i)}" cy="${yOf(s)}" r="3" fill="${windBand(s).color}"></circle>`).join('')}
+    ${hourLabels}
+  `;
+  modalLegend.innerHTML = `
+    <span class="legend-item"><span class="swatch solid"></span>Wind speed</span>
+    <span class="legend-item"><span class="swatch dashed"></span>Gusts</span>
+  `;
+  modal.hidden = false;
+}
+
+function closeLiveModal() {
+  document.getElementById('liveModal').hidden = true;
 }
 
 function drawTicks(svg) {
@@ -1262,7 +1671,34 @@ function drawGaugeRange(loKn, hiKn, colorLo, colorHi) {
 }
 
 function renderBadges(container, flags) {
-  container.innerHTML = (flags || []).map(flagHTML).join('');
+  const section = document.getElementById('conditionsSection');
+  if (!flags || !flags.length) {
+    section.hidden = true;
+    container.innerHTML = '';
+    return;
+  }
+  section.hidden = false;
+  container.innerHTML = flags.map(flagHTML).join('');
+  setupConditionsScroll();
+  setupConditionPills(container);
+}
+
+function setupConditionsScroll() {
+  const container = document.getElementById('badgesWrap');
+  const leftBtn = document.getElementById('condChevronLeft');
+  const rightBtn = document.getElementById('condChevronRight');
+  if (!container || !leftBtn || !rightBtn) return;
+
+  function updateChevrons() {
+    const hasOverflow = container.scrollWidth > container.clientWidth + 2;
+    leftBtn.hidden = !hasOverflow || container.scrollLeft <= 2;
+    rightBtn.hidden = !hasOverflow || container.scrollLeft >= (container.scrollWidth - container.clientWidth - 2);
+  }
+  container.addEventListener('scroll', updateChevrons);
+  window.addEventListener('resize', updateChevrons);
+  leftBtn.onclick = () => container.scrollBy({ left: -180, behavior: 'smooth' });
+  rightBtn.onclick = () => container.scrollBy({ left: 180, behavior: 'smooth' });
+  updateChevrons();
 }
 
 function joinWithAmpersand(items) {
@@ -1302,34 +1738,87 @@ function renderLegend() {
   }).join('');
 }
 
+let currentOutlookDays = [];
+let currentOutlookDirection = 'westerly';
+
+function outlookDayHTML(d, fallbackDirection, idx) {
+  if (d.low == null || d.high == null) {
+    return `<div class="outlook-day empty"><div class="dname">${d.day}</div><div class="none">No data</div></div>`;
+  }
+  const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
+  const dir = d.direction || fallbackDirection || 'westerly';
+  const deg = directionArrowDeg(dir);
+  const letter = directionLetter(dir);
+  const band = windBand(hiKn);
+  return `
+    <button type="button" class="outlook-day" data-day-idx="${idx}" style="background:${band.color};border-color:${band.color}">
+      <div class="dname" style="color:${band.ink}">${d.day}</div>
+      <div class="arrow-wrap">
+        <svg viewBox="0 0 24 24" style="transform:rotate(${deg}deg)">
+          <path d="M12 3 L12 21 M12 3 L6 9 M12 3 L18 9" stroke="${band.ink}" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="dir-letter" style="color:${band.ink}">${letter}</span>
+      </div>
+      <div class="range" style="color:${band.ink}">${loKn}–${hiKn}</div>
+      <div class="kite" style="color:${band.ink};opacity:0.85">${band.kite}</div>
+    </button>`;
+}
+
 function renderOutlook(days, fallbackDirection) {
-  const row = document.getElementById('outlookRow');
+  const topRow = document.getElementById('outlookRowTop');
+  const bottomRow = document.getElementById('outlookRowBottom');
+  currentOutlookDays = days || [];
+  currentOutlookDirection = fallbackDirection || 'westerly';
   if (!days || !days.length) {
-    row.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No multi-day breakdown available today — check Temira's full forecast for the extended outlook.</div>`;
+    topRow.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No multi-day breakdown available today — check Temira's full forecast for the extended outlook.</div>`;
+    bottomRow.innerHTML = '';
     return;
   }
-  row.innerHTML = days.map(d => {
-    if (d.low == null || d.high == null) {
-      return `<div class="outlook-day empty"><div class="dname">${d.day}</div><div class="none">No data</div></div>`;
-    }
-    const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
-    const dir = d.direction || fallbackDirection || 'westerly';
-    const deg = directionArrowDeg(dir);
-    const letter = directionLetter(dir);
-    const band = windBand(hiKn);
-    return `
-      <div class="outlook-day" style="background:${band.color};border-color:${band.color}">
-        <div class="dname" style="color:${band.ink}">${d.day}</div>
-        <div class="arrow-wrap">
-          <svg viewBox="0 0 24 24" style="transform:rotate(${deg}deg)">
-            <path d="M12 3 L12 21 M12 3 L6 9 M12 3 L18 9" stroke="${band.ink}" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span class="dir-letter" style="color:${band.ink}">${letter}</span>
-        </div>
-        <div class="range" style="color:${band.ink}">${loKn}–${hiKn}</div>
-        <div class="kite" style="color:${band.ink};opacity:0.85">${band.kite}</div>
-      </div>`;
-  }).join('');
+  const first4 = days.slice(0, 4);
+  const rest = days.slice(4);
+  topRow.innerHTML = first4.map((d, i) => outlookDayHTML(d, fallbackDirection, i)).join('');
+  bottomRow.innerHTML = rest.map((d, i) => outlookDayHTML(d, fallbackDirection, i + 4)).join('');
+
+  document.querySelectorAll('.outlook-day[data-day-idx]').forEach(btn => {
+    btn.addEventListener('click', () => openOutlookModal(parseInt(btn.dataset.dayIdx, 10)));
+  });
+}
+
+function openOutlookModal(idx) {
+  const d = currentOutlookDays[idx];
+  if (!d || d.low == null || d.high == null) return;
+  const loKn = mphToKn(d.low), hiKn = mphToKn(d.high);
+  const dir = d.direction || currentOutlookDirection || 'westerly';
+  const band = windBand(hiKn);
+
+  // Per-zone breakdown only exists for TODAY (index 0) — the scrape gives us
+  // real per-spot numbers for today via prose + windtable OCR, but future
+  // days only ever have one aggregate range, no zone attribution.
+  let zonesHTML = '';
+  if (idx === 0 && currentData && currentData.zones && currentData.zones.length) {
+    zonesHTML = `
+      <div class="outlook-modal-zones-title">By spot today</div>
+      ${currentData.zones.map(z => `
+        <div class="outlook-modal-row"><span class="lbl">${z.zone}</span><span class="val">${mphToKn(z.low)}–${mphToKn(z.high)}kn</span></div>
+      `).join('')}
+    `;
+  } else if (idx !== 0) {
+    zonesHTML = `<div class="outlook-modal-note">Per-spot breakdown isn't available for future days — only today's forecast breaks out by zone.</div>`;
+  }
+
+  document.getElementById('outlookModalTitle').textContent = d.day;
+  document.getElementById('outlookModalBody').innerHTML = `
+    <div class="outlook-modal-range" style="color:${band.color}">${loKn}<span>–</span>${hiKn}<span class="unit">kn</span></div>
+    <div class="outlook-modal-row"><span class="lbl">Direction</span><span class="val">${directionLabel(dir)}</span></div>
+    <div class="outlook-modal-row"><span class="lbl">Recommended kite</span><span class="val">${band.kite}</span></div>
+    <div class="outlook-modal-row"><span class="lbl">Conditions</span><span class="val">${band.label}</span></div>
+    ${zonesHTML}
+  `;
+  document.getElementById('outlookModal').hidden = false;
+}
+
+function closeOutlookModal() {
+  document.getElementById('outlookModal').hidden = true;
 }
 
 
@@ -1507,7 +1996,6 @@ function render(data) {
       </div>`;
     wrap.appendChild(card);
   });
-  setupTooltipDismiss(document);
 }
 
 function setupNavHighlight() {
@@ -1526,8 +2014,13 @@ function setupNavHighlight() {
   });
 
   window.addEventListener('scroll', () => {
+    const atBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 4);
     let idx = 0;
-    sections.forEach((sec, i) => { if (sec && window.scrollY >= sec.offsetTop - 90) idx = i; });
+    if (atBottom) {
+      idx = sections.length - 1;
+    } else {
+      sections.forEach((sec, i) => { if (sec && window.scrollY >= sec.offsetTop - 90) idx = i; });
+    }
     links.forEach((l, i) => l.classList.toggle('active', i === idx));
   });
 }
@@ -1540,8 +2033,40 @@ if (window.location.hash) {
 }
 window.scrollTo(0, 0);
 
+document.addEventListener('click', () => {
+  document.querySelectorAll('.pill.expanded').forEach(b => b.classList.remove('expanded'));
+});
+
 loadData().then(data => { render(data); setupNavHighlight(); });
-loadLive().then(renderLive);
+document.getElementById('liveChartTap').addEventListener('click', openLiveModal);
+document.getElementById('liveModalClose').addEventListener('click', closeLiveModal);
+document.getElementById('liveModal').addEventListener('click', (e) => {
+  if (e.target.id === 'liveModal') closeLiveModal(); // clicked the overlay itself, not the card
+});
+document.getElementById('outlookModalClose').addEventListener('click', closeOutlookModal);
+document.getElementById('outlookModal').addEventListener('click', (e) => {
+  if (e.target.id === 'outlookModal') closeOutlookModal();
+});
+
+const ICON_ZOOM_IN = `<svg viewBox="0 0 24 24" width="19" height="19"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="7" x2="10" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+const ICON_ZOOM_OUT = `<svg viewBox="0 0 24 24" width="19" height="19"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2"/><line x1="15" y1="15" x2="21" y2="21" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"/><line x1="7" y1="10" x2="13" y2="10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`;
+
+function setA11yMode(on) {
+  document.documentElement.classList.toggle('a11y', on);
+  const btn = document.getElementById('a11yToggle');
+  btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  btn.innerHTML = on ? ICON_ZOOM_OUT : ICON_ZOOM_IN;
+  try { localStorage.setItem('gorgeA11yMode', on ? '1' : '0'); } catch (e) {}
+}
+document.getElementById('a11yToggle').addEventListener('click', () => {
+  setA11yMode(!document.documentElement.classList.contains('a11y'));
+});
+let storedA11y = '0';
+try { storedA11y = localStorage.getItem('gorgeA11yMode') || '0'; } catch (e) {}
+setA11yMode(storedA11y === '1');
+
+setupLiveLocationPicker();
+selectLiveLocation(LIVE_LOCATIONS[0]);
 </script>
 
 </body>
