@@ -646,7 +646,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
       </div>
       <div class="live-location-picker">
         <button type="button" id="liveRangeTrigger" class="live-location-trigger" aria-haspopup="listbox" aria-expanded="false">
-          <span id="liveRangeTriggerLabel">+12h</span>
+          <span id="liveRangeTriggerLabel">Now</span>
           <svg class="trigger-chevron" viewBox="0 0 24 24" width="14" height="14"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
         <div id="liveRangeMenu" class="live-location-menu" role="listbox" hidden></div>
@@ -656,7 +656,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
 
     <hr class="section-divider">
 
-    <div class="live-currently-label" id="liveCurrentlyLabel">Currently:</div>
+    <div class="live-currently-label" id="liveCurrentlyLabel">Conditions at:</div>
     <div class="live-current" id="liveCurrent"></div>
     <hr class="section-divider">
     <svg class="modal-chart" id="sparkline" viewBox="0 0 600 260" preserveAspectRatio="xMidYMid meet"></svg>
@@ -1417,7 +1417,7 @@ async function loadLive(lat, lon) {
 
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
     `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m&current=temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m` +
-    `&wind_speed_unit=kn&temperature_unit=fahrenheit&timezone=auto&forecast_hours=13`;
+    `&wind_speed_unit=kn&temperature_unit=fahrenheit&timezone=auto&forecast_days=1`;
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error('open-meteo unavailable');
@@ -1496,7 +1496,16 @@ async function selectLiveLocation(loc) {
 // the full 12h array cached from the location fetch, so this just re-slices
 // it. Still shows the same brief loading flash as a location change, for
 // consistent feel rather than one interaction being instant and the other not.
-async function selectLiveRange(hours) {
+// Fixed clock-hour ranges, matching the same period vocabulary already
+// used in the Zones section (PERIOD_HOURS above), so "Afternoon" means the
+// same thing in both places. 'Now' is the one dynamic option — anchored to
+// whatever hour it actually is when the data loads, not a fixed range.
+const LIVE_PERIOD_RANGES = {
+  'Dawn': [5, 7], 'Early': [7, 9], 'Morning': [9, 12],
+  'Afternoon': [12, 17], 'Evening': [17, 21], 'Night': [21, 24],
+};
+
+async function selectLivePeriod(periodKey) {
   const myRequestId = ++liveRequestId;
   document.getElementById('liveLoading').hidden = false;
 
@@ -1504,17 +1513,17 @@ async function selectLiveRange(hours) {
   if (myRequestId !== liveRequestId) return;
 
   document.getElementById('liveLoading').hidden = true;
-  renderLiveChart(hours);
+  renderLiveChart(periodKey);
 }
 
 function setupLiveRangePicker() {
   const trigger = document.getElementById('liveRangeTrigger');
   const label = document.getElementById('liveRangeTriggerLabel');
   const menu = document.getElementById('liveRangeMenu');
-  const options = [3, 6, 9, 12];
+  const options = ['Now', 'Dawn', 'Early', 'Morning', 'Afternoon', 'Evening', 'Night'];
 
-  menu.innerHTML = options.map(h =>
-    `<button type="button" role="option" data-hours="${h}" class="${h === 12 ? 'active' : ''}">+${h}h</button>`
+  menu.innerHTML = options.map(p =>
+    `<button type="button" role="option" data-period="${p}" class="${p === 'Now' ? 'active' : ''}">${p}</button>`
   ).join('');
 
   function closeMenu() {
@@ -1536,9 +1545,9 @@ function setupLiveRangePicker() {
   menu.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', () => {
       menu.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
-      label.textContent = `+${btn.dataset.hours}h`;
+      label.textContent = btn.dataset.period;
       closeMenu();
-      selectLiveRange(parseInt(btn.dataset.hours, 10));
+      selectLivePeriod(btn.dataset.period);
     });
   });
 }
@@ -1549,6 +1558,30 @@ function degToCompass(deg) {
 }
 
 let lastLiveData = null, lastLiveLocationName = '';
+
+function findNowIndex(hourlyTimes) {
+  if (!hourlyTimes || !hourlyTimes.length) return 0;
+  const now = new Date();
+  for (let i = 0; i < hourlyTimes.length; i++) {
+    const t = new Date(hourlyTimes[i]);
+    if (t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth() &&
+        t.getDate() === now.getDate() && t.getHours() === now.getHours()) {
+      return i;
+    }
+  }
+  return 0;
+}
+
+function statsLabel(idx) {
+  if (!lastLiveData || !lastLiveData.hourly || !lastLiveData.hourly.time) return 'Conditions at:';
+  const time = formatHourLabel(lastLiveData.hourly.time[idx]);
+  const offset = idx - liveNowIdx;
+  if (offset === 0) return `Conditions at: ${time} (Now)`;
+  const sign = offset > 0 ? '+' : '';
+  return `Conditions at: ${time} (${sign}${offset}h)`;
+}
+
+let liveNowIdx = 0;
 
 function renderLive(data, locationName) {
   const currentWrap = document.getElementById('liveCurrent');
@@ -1564,17 +1597,23 @@ function renderLive(data, locationName) {
 
   lastLiveData = data;
   lastLiveLocationName = locationName;
+  liveNowIdx = findNowIndex(data.hourly && data.hourly.time);
 
   sub.textContent = `${locationName || 'Swell City, OR'} · Open-Meteo forecast model`;
   const c = data.current;
 
-  renderStatsBlock(0, 'Currently:', {
+  renderStatsBlock(liveNowIdx, statsLabel(liveNowIdx), {
     speed: c.wind_speed_10m, gust: c.wind_gusts_10m, dir: c.wind_direction_10m, temp: c.temperature_2m,
   });
 
+  // Reset the picker to 'Now' on fresh data (new location fetch)
+  const rangeLabel = document.getElementById('liveRangeTriggerLabel');
+  if (rangeLabel) rangeLabel.textContent = 'Now';
+  document.querySelectorAll('#liveRangeMenu button').forEach(b => b.classList.toggle('active', b.dataset.period === 'Now'));
+
   const speeds = (data.hourly && data.hourly.wind_speed_10m || []);
   if (!speeds.length) { spark.innerHTML = ''; return; }
-  renderLiveChart(currentHourRange);
+  renderLiveChart('Now');
 }
 
 function formatHourLabel(isoString) {
@@ -1631,7 +1670,7 @@ function renderStatsBlock(idx, label, overrideValues) {
   setupStatTooltips(currentWrap);
 }
 
-let currentHourRange = 12;
+let currentPeriodKey = 'Now';
 
 // Duration scales gently with text length so longer descriptions get more
 // time to read, capped at a sensible range.
@@ -1674,15 +1713,31 @@ document.addEventListener('click', () => {
   document.querySelectorAll('.stat-tip').forEach(t => t.hidden = true);
 });
 
-function renderLiveChart(hours) {
-  currentHourRange = hours;
+function renderLiveChart(periodKey) {
+  currentPeriodKey = periodKey;
   const spark = document.getElementById('sparkline');
   const legend = document.getElementById('sparkLegend');
   if (!lastLiveData || !lastLiveData.hourly) return;
 
-  const speeds = (lastLiveData.hourly.wind_speed_10m || []).slice(0, hours + 1);
-  const gusts = (lastLiveData.hourly.wind_gusts_10m || []).slice(0, hours + 1);
-  const times = (lastLiveData.hourly.time || []).slice(0, hours + 1);
+  const allSpeeds = lastLiveData.hourly.wind_speed_10m || [];
+  const allGusts = lastLiveData.hourly.wind_gusts_10m || [];
+  const allTimes = lastLiveData.hourly.time || [];
+
+  // 'Now' anchors to page-load time and shows the next 12h; named periods
+  // use the same fixed clock-hour ranges as the Zones section.
+  let startIdx, endIdx;
+  if (periodKey === 'Now') {
+    startIdx = liveNowIdx;
+    endIdx = Math.min(liveNowIdx + 12, allSpeeds.length - 1);
+  } else {
+    const [startHour, endHour] = LIVE_PERIOD_RANGES[periodKey] || [0, 23];
+    startIdx = Math.min(startHour, allSpeeds.length - 1);
+    endIdx = Math.min(endHour, allSpeeds.length - 1);
+  }
+
+  const speeds = allSpeeds.slice(startIdx, endIdx + 1);
+  const gusts = allGusts.slice(startIdx, endIdx + 1);
+  const times = allTimes.slice(startIdx, endIdx + 1);
 
   // Real margins on all four sides so nothing (axis labels, the last hour
   // label, the 0kn tick) ever sits exactly on the viewBox edge, where it
@@ -1703,12 +1758,13 @@ function renderLiveChart(hours) {
   for (let v = 5; v < max; v += 5) {
     if (!ticks.includes(v)) minorTicks.push(v);
   }
-  const labelStep = hours <= 6 ? 1 : 3;
-  const nowLabel = times[0] ? `Now (${formatHourLabel(times[0])})` : 'Now';
+  const labelStep = speeds.length <= 7 ? 1 : 3;
   const hourLabels = speeds.map((_, i) => {
-    if (i % labelStep !== 0) return '';
+    if (i % labelStep !== 0 && i !== speeds.length - 1) return '';
     const anchor = i === speeds.length - 1 ? 'end' : i === 0 ? 'start' : 'middle';
-    return `<text x="${x(i)}" y="${h - 8}" font-size="10" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace" text-anchor="${anchor}">${i === 0 ? nowLabel : '+' + i + 'h'}</text>`;
+    const globalIdx = startIdx + i;
+    const label = globalIdx === liveNowIdx ? `Now (${formatHourLabel(times[i])})` : formatHourLabel(times[i]);
+    return `<text x="${x(i)}" y="${h - 8}" font-size="10" fill="var(--text-low)" font-family="'IBM Plex Mono',monospace" text-anchor="${anchor}">${label}</text>`;
   }).join('');
 
   spark.setAttribute('viewBox', `0 0 ${w} ${h}`);
@@ -1724,7 +1780,7 @@ function renderLiveChart(hours) {
     }).join('')}
     <polyline points="${gustPts}" fill="none" stroke="var(--text-low)" stroke-width="1.6" stroke-dasharray="4,3" stroke-linejoin="round" stroke-linecap="round"></polyline>
     <polyline points="${speedPts}" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
-    ${speeds.map((s, i) => `<g class="chart-point" data-idx="${i}"><circle cx="${x(i)}" cy="${yOf(s)}" r="15" fill="transparent"></circle><circle cx="${x(i)}" cy="${yOf(s)}" r="5" fill="${windBand(s).color}" stroke="var(--bg)" stroke-width="1.5"></circle></g>`).join('')}
+    ${speeds.map((s, i) => `<g class="chart-point" data-idx="${startIdx + i}"><circle cx="${x(i)}" cy="${yOf(s)}" r="15" fill="#000" fill-opacity="0.01" pointer-events="all"></circle><circle cx="${x(i)}" cy="${yOf(s)}" r="5" fill="${windBand(s).color}" stroke="var(--bg)" stroke-width="1.5" pointer-events="none"></circle></g>`).join('')}
     ${hourLabels}
   `;
   legend.innerHTML = `
@@ -1736,8 +1792,7 @@ function renderLiveChart(hours) {
     g.addEventListener('click', (e) => {
       e.stopPropagation();
       const idx = parseInt(g.dataset.idx, 10);
-      const label = idx === 0 ? 'Currently:' : `At ${formatHourLabel(times[idx])}:`;
-      renderStatsBlock(idx, label);
+      renderStatsBlock(idx, statsLabel(idx));
     });
   });
 }
