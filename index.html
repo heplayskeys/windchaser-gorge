@@ -1718,6 +1718,32 @@ function statsLabel(idx) {
 
 let liveNowIdx = 0;
 
+// Recomputes which hourly point is 'Now' using data we already have (no
+// new network call) — without this, a page left open across an hour
+// boundary would keep 'Now' stuck on whatever hour it was when the data
+// first loaded. Scheduled to fire right at the top of each hour rather
+// than polling, so it's exact rather than approximate.
+function refreshNowIdx() {
+  if (!lastLiveData || !lastLiveData.hourly) return;
+  const newIdx = findNowIndex(lastLiveData.hourly.time);
+  if (newIdx === liveNowIdx) return; // still the same hour, nothing to update
+  liveNowIdx = newIdx;
+  renderLiveChart(currentPeriodKey); // hour labels reference liveNowIdx regardless of which period is shown
+  if (currentPeriodKey === 'Now') {
+    renderStatsBlock(liveNowIdx, statsLabel(liveNowIdx));
+  }
+}
+
+function scheduleNowIdxRefresh() {
+  const now = new Date();
+  const msUntilNextHour = ((59 - now.getMinutes()) * 60 + (60 - now.getSeconds())) * 1000;
+  setTimeout(() => {
+    refreshNowIdx();
+    scheduleNowIdxRefresh(); // reschedule for the following hour
+  }, msUntilNextHour + 1500); // small buffer past the boundary
+}
+scheduleNowIdxRefresh();
+
 function renderLive(data, locationName) {
   const currentWrap = document.getElementById('liveCurrent');
   const spark = document.getElementById('sparkline');
