@@ -25,8 +25,15 @@ import os
 import re
 import sys
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import requests
+
+# The Gorge, and both source sites, all operate on Pacific time — "today"
+# needs to mean Pacific's today, not UTC's. UTC is far enough ahead that a
+# run any time after ~5pm Pacific would otherwise see "tomorrow" in UTC
+# while it's still today in the Gorge, silently skipping the current day.
+PACIFIC = ZoneInfo("America/Los_Angeles")
 from bs4 import BeautifulSoup
 
 try:
@@ -429,7 +436,7 @@ def build_weekly_outlook(daily, today_low, today_high, today_direction):
     always represents the full week.
     """
     python_to_day = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-    today_idx = datetime.now(timezone.utc).weekday()  # Mon=0..Sun=6
+    today_idx = datetime.now(PACIFIC).weekday()  # Mon=0..Sun=6 — Pacific, not UTC (see PACIFIC comment above)
     ordered_names = (python_to_day[today_idx:] + python_to_day[:today_idx])[:7]
 
     outlook = []
@@ -1036,7 +1043,7 @@ def main():
     try:
         location_data = fetch_weekly_location_forecast()
         agg_by_date = aggregate_weekly_forecast(location_data)
-        today_date = datetime.now(timezone.utc).date()
+        today_date = datetime.now(PACIFIC).date()
         result["weekly_location_forecast"] = [
             agg_by_date.get((today_date + timedelta(days=i)).isoformat())
             for i in range(7)
