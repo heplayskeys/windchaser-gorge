@@ -630,6 +630,8 @@
   .card-content { padding: 1.05rem 1.15rem; display: flex; flex-direction: column; gap: 0.35rem; }
   .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
   .source-name { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 1.1rem; text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.4rem; }
+  .card-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); flex: 0 0 auto; white-space: nowrap; }
+  .zones-heading-right { display: flex; align-items: baseline; gap: 0.6rem; }
   .card.green-edge .source-name { color: var(--green); }
   .card.yellow-edge .source-name { color: var(--yellow); }
   .ext-link-icon { flex: 0 0 auto; opacity: 0.85; }
@@ -755,7 +757,10 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
   <section id="zones" class="panel">
     <div class="panel-heading-row">
       <h2>Wind by Zone</h2>
-      <span class="period-hours" id="periodHours"></span>
+      <div class="zones-heading-right">
+        <span class="period-hours" id="periodHours"></span>
+        <span class="card-date" id="zonesDate"></span>
+      </div>
     </div>
     <div class="sub" id="zonesSub">Today's wind — WESTERLY</div>
     <div class="period-buttons" id="periodButtons"></div>
@@ -830,7 +835,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
   <section id="sources" class="sources"></section>
 
   <footer>
-    Human forecasts scraped once daily. Live model data comes from the
+    Human forecasts pulled once daily. Live model data comes from the
     Open-Meteo API and updates on page load; it's a computer model, not a
     replacement for Temira's or Victor's local knowledge. Always check the
     full source before committing to a session, especially around
@@ -931,6 +936,10 @@ function setupConditionPills(root) {
 
 function formatScrapedDate(iso) {
   return new Date(iso).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+function formatShortDate(iso) {
+  return new Date(iso).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', timeZone: 'America/Los_Angeles' });
 }
 
 async function copySourceToClipboard(source, generatedAt, btn) {
@@ -2479,6 +2488,7 @@ function render(data) {
   const svg = document.getElementById('gaugeSvg');
   drawTicks(svg);
   currentData = data;
+  document.getElementById('zonesDate').textContent = formatShortDate(data.generated_at);
 
   renderBadges(document.getElementById('badgesWrap'), data.flags);
   renderAgreement(data.zones);
@@ -2489,7 +2499,7 @@ function render(data) {
 
   const updated = new Date(data.generated_at);
   document.getElementById('updated').textContent =
-    'Last scraped ' + updated.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles', timeZoneName: 'short' });
+    'Last updated ' + updated.toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'America/Los_Angeles', timeZoneName: 'short' });
 
   const wrap = document.getElementById('sources');
   wrap.innerHTML = '';
@@ -2515,6 +2525,7 @@ function render(data) {
               <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
             </svg>
           </div>
+          <span class="card-date">${formatShortDate(data.generated_at)}</span>
         </div>
         ${s.credibility ? `<div class="credibility">${s.credibility}</div>` : ''}
         <div class="ai-summary">
