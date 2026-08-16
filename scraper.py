@@ -917,15 +917,22 @@ def merge_time_segments(all_segment_lists):
 
 # Same 8 locations the dashboard's Live Model Data section already knows
 # about — kept in sync manually with the LIVE_LOCATIONS array in index.html.
+# Coordinates target the Columbia River waterway itself (the actual wind
+# corridor), not town centers. Swell City is anchored against a verified
+# coordinate for the Hood River Event Site (45.7153, -121.5178 — Wikipedia)
+# shifted ~3mi west per its known description as "a few miles west of Hood
+# River." The rest are best-effort adjustments toward the river channel
+# based on known geography, not individually verified per-spot. Kept in
+# sync with the matching array in index.html.
 LIVE_LOCATIONS = [
-    {"name": "Swell City, OR", "lat": 45.7133, "lon": -121.5254},
-    {"name": "Stevenson, WA", "lat": 45.6976, "lon": -121.8934},
-    {"name": "Viento, OR", "lat": 45.7025, "lon": -121.6660},
-    {"name": "Mosier, OR", "lat": 45.6821, "lon": -121.3971},
-    {"name": "The Dalles, OR", "lat": 45.5946, "lon": -121.1787},
-    {"name": "Lyle, WA", "lat": 45.6960, "lon": -121.2860},
-    {"name": "Rufus, OR", "lat": 45.6748, "lon": -120.7256},
-    {"name": "Arlington, OR", "lat": 45.7168, "lon": -120.2103},
+    {"name": "Swell City, OR", "lat": 45.7123, "lon": -121.5799},
+    {"name": "Stevenson, WA", "lat": 45.6940, "lon": -121.8934},
+    {"name": "Viento, OR", "lat": 45.7020, "lon": -121.6660},
+    {"name": "Mosier, OR", "lat": 45.6880, "lon": -121.3971},
+    {"name": "The Dalles, OR", "lat": 45.6120, "lon": -121.1800},
+    {"name": "Lyle, WA", "lat": 45.6940, "lon": -121.2860},
+    {"name": "Rufus, OR", "lat": 45.6750, "lon": -120.7260},
+    {"name": "Arlington, OR", "lat": 45.7170, "lon": -120.2110},
 ]
 
 
@@ -943,7 +950,7 @@ def fetch_weekly_location_forecast():
     for loc in LIVE_LOCATIONS:
         try:
             url = (
-                f"https://api.open-meteo.com/v1/forecast?latitude={loc['lat']}&longitude={loc['lon']}"
+                f"https://api.open-meteo.com/v1/gfs?latitude={loc['lat']}&longitude={loc['lon']}"
                 f"&hourly=wind_speed_10m&wind_speed_unit=kn&timezone=auto&forecast_days=7"
             )
             resp = requests.get(url, timeout=20)
