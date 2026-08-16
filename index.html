@@ -1677,7 +1677,8 @@ async function selectLivePeriod(periodKey) {
 
   document.getElementById('liveLoading').hidden = true;
   renderLiveChart(periodKey);
-  renderStatsBlock(currentChartStartIdx, statsLabel(currentChartStartIdx));
+  const idx = defaultStatsIdxForChart();
+  renderStatsBlock(idx, statsLabel(idx));
 }
 
 function closeLiveRangeMenu() {
@@ -1831,7 +1832,8 @@ function renderLive(data, locationName) {
   if (!speeds.length) { spark.innerHTML = ''; return; }
   renderLiveChart(currentPeriodKey);
   if (currentPeriodKey !== 'Now') {
-    renderStatsBlock(currentChartStartIdx, statsLabel(currentChartStartIdx));
+    const idx = defaultStatsIdxForChart();
+    renderStatsBlock(idx, statsLabel(idx));
   }
 }
 
@@ -1891,6 +1893,17 @@ function renderStatsBlock(idx, label, overrideValues) {
 
 let currentPeriodKey = 'Now';
 let currentChartStartIdx = 0;
+let currentChartEndIdx = 0;
+
+// When a segment includes the current hour, default to that hour instead
+// of the segment's first point — e.g. selecting "Afternoon" at 2pm should
+// land on 2pm, not noon, since that's the more useful default to see first.
+function defaultStatsIdxForChart() {
+  if (liveNowIdx >= currentChartStartIdx && liveNowIdx <= currentChartEndIdx) {
+    return liveNowIdx;
+  }
+  return currentChartStartIdx;
+}
 
 // Duration scales gently with text length so longer descriptions get more
 // time to read, capped at a sensible range.
@@ -1961,6 +1974,7 @@ function renderLiveChart(periodKey) {
   const gusts = allGusts.slice(startIdx, endIdx + 1);
   const times = allTimes.slice(startIdx, endIdx + 1);
   currentChartStartIdx = startIdx;
+  currentChartEndIdx = endIdx;
 
   // Real margins on all four sides so nothing (axis labels, the last hour
   // label, the 0kn tick) ever sits exactly on the viewBox edge, where it
