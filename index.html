@@ -1797,9 +1797,13 @@ scheduleNowIdxRefresh();
 // backgrounded (iOS suspends JS timers to save battery) — reopening or
 // switching back to the tab needs its own explicit check, otherwise 'Now'
 // can stay stuck on whatever hour it was when the page was minimized.
+// Same reasoning applies to the new-data check below — the 5-minute
+// interval gets suspended while backgrounded and doesn't reliably catch up
+// on its own, so reopening needs to force an immediate check too.
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     refreshNowIdx();
+    checkForNewData();
   }
 });
 
@@ -2653,7 +2657,10 @@ async function checkForNewData() {
   } catch (e) {}
 }
 
-document.getElementById('refreshBtn').addEventListener('click', manualRefresh);
+document.getElementById('refreshBtn').addEventListener('click', async () => {
+  await manualRefresh();
+  startUpdateCheckInterval();
+});
 let liveRefreshState = 'idle'; // 'idle' | 'expanded' | 'cooldown'
 let liveRefreshAutoCollapseTimer = null;
 
@@ -2699,12 +2706,19 @@ document.addEventListener('click', () => {
   }
 });
 
-document.getElementById('updateToastRefresh').addEventListener('click', () => {
+let updateCheckIntervalId = null;
+function startUpdateCheckInterval() {
+  clearInterval(updateCheckIntervalId);
+  updateCheckIntervalId = setInterval(checkForNewData, 5 * 60 * 1000);
+}
+
+document.getElementById('updateToastRefresh').addEventListener('click', async () => {
   document.getElementById('updateToast').hidden = true;
-  manualRefresh();
+  await manualRefresh();
+  startUpdateCheckInterval();
 });
 document.getElementById('updateToastDismiss').addEventListener('click', dismissUpdatePopup);
-setInterval(checkForNewData, 5 * 60 * 1000);
+startUpdateCheckInterval();
 
 initialLoad();
 document.getElementById('outlookModalClose').addEventListener('click', closeOutlookModal);
