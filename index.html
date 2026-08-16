@@ -58,6 +58,43 @@
   header { padding-top: max(1.5rem, env(safe-area-inset-top)); }
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.13em; color: var(--text-low); text-transform: uppercase; }
   .header-top-row { display: flex; justify-content: space-between; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  #live .panel-heading-row { align-items: center; }
+  .live-refresh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    color: var(--text-mid);
+    background: var(--panel-raised);
+    border: 1px solid var(--panel-line);
+    border-radius: 999px;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: width 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+  .live-refresh-btn svg { flex: 0 0 auto; }
+  .live-refresh-label {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    font-weight: 700;
+    transition: max-width 0.2s ease, opacity 0.15s ease, margin-left 0.2s ease;
+  }
+  .live-refresh-btn.expanded {
+    width: auto;
+    padding: 0 0.75rem;
+    background: var(--yellow);
+    border-color: var(--yellow);
+    color: var(--yellow-ink);
+  }
+  .live-refresh-btn.expanded .live-refresh-label { max-width: 120px; opacity: 1; margin-left: 0.4rem; }
+  .live-refresh-btn.spinning svg { animation: refresh-spin 0.8s linear infinite; }
+  .live-refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .refresh-btn[hidden] { display: none; }
   .refresh-btn {
     position: relative;
@@ -262,7 +299,8 @@
   /* ---------- Panels ---------- */
   .panel { position: relative; margin-top: 1.4rem; background: var(--panel); border: 1px solid var(--panel-line); border-radius: 10px; padding: 1.15rem 1.2rem 1.3rem; }
   .panel h2 { font-family: 'Big Shoulders Display', sans-serif; font-size: 1.05rem; text-transform: uppercase; color: var(--text-hi); margin-bottom: 0.15rem; }
-  .panel-heading-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .panel-heading-row { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; margin-bottom: 0.6rem; }
+  #outlook h2 { margin-bottom: 0.6rem; }
   .period-hours { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-low); white-space: nowrap; }
   .panel .sub { font-size: 0.78rem; color: var(--text-mid); margin-bottom: 1rem; }
 
@@ -740,7 +778,13 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
   </section>
 
   <section id="live" class="panel">
-    <h2>Live Model Data</h2>
+    <div class="panel-heading-row">
+      <h2>Live Model Data</h2>
+      <button type="button" id="liveRefreshBtn" class="live-refresh-btn" aria-label="Refresh live data">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M21 12a9 9 0 1 1-3-6.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M21 3v6h-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="live-refresh-label">Refresh Data</span>
+      </button>
+    </div>
     <div class="sub" id="liveSub">Swell City, OR · Open-Meteo forecast model</div>
     <div class="live-picker-row">
       <div class="live-location-picker">
@@ -1519,9 +1563,11 @@ function setCachedLive(lat, lon, data) {
   }
 }
 
-async function loadLive(lat, lon) {
-  const cached = getCachedLive(lat, lon);
-  if (cached) return cached;
+async function loadLive(lat, lon, forceRefresh) {
+  if (!forceRefresh) {
+    const cached = getCachedLive(lat, lon);
+    if (cached) return cached;
+  }
 
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
     `&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m&current=temperature_2m,wind_speed_10m,wind_gusts_10m,wind_direction_10m` +
@@ -1580,7 +1626,7 @@ function setupLiveLocationPicker() {
 // not whichever network response happens to arrive last.
 let liveRequestId = 0;
 
-async function selectLiveLocation(loc) {
+async function selectLiveLocation(loc, forceRefresh) {
   const myRequestId = ++liveRequestId;
 
   document.getElementById('liveCurrent').innerHTML = '';
@@ -1592,7 +1638,7 @@ async function selectLiveLocation(loc) {
   // otherwise cached taps would flash by while fresh ones visibly load,
   // which reads as inconsistent/glitchy.
   const minDelay = new Promise(resolve => setTimeout(resolve, 280));
-  const [data] = await Promise.all([loadLive(loc.lat, loc.lon), minDelay]);
+  const [data] = await Promise.all([loadLive(loc.lat, loc.lon, forceRefresh), minDelay]);
 
   if (myRequestId !== liveRequestId) return; // superseded by a newer tap — discard this stale result
 
@@ -1743,6 +1789,16 @@ function scheduleNowIdxRefresh() {
   }, msUntilNextHour + 1500); // small buffer past the boundary
 }
 scheduleNowIdxRefresh();
+
+// The scheduled hourly timer above doesn't fire while the tab is
+// backgrounded (iOS suspends JS timers to save battery) — reopening or
+// switching back to the tab needs its own explicit check, otherwise 'Now'
+// can stay stuck on whatever hour it was when the page was minimized.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    refreshNowIdx();
+  }
+});
 
 function renderLive(data, locationName) {
   const currentWrap = document.getElementById('liveCurrent');
@@ -2583,6 +2639,51 @@ async function checkForNewData() {
 }
 
 document.getElementById('refreshBtn').addEventListener('click', manualRefresh);
+let liveRefreshState = 'idle'; // 'idle' | 'expanded' | 'cooldown'
+let liveRefreshAutoCollapseTimer = null;
+
+function setLiveRefreshState(state) {
+  const btn = document.getElementById('liveRefreshBtn');
+  liveRefreshState = state;
+  btn.classList.toggle('expanded', state === 'expanded');
+  btn.disabled = (state === 'cooldown');
+}
+
+document.getElementById('liveRefreshBtn').addEventListener('click', async (e) => {
+  e.stopPropagation();
+  const btn = document.getElementById('liveRefreshBtn');
+
+  if (liveRefreshState === 'idle') {
+    // First tap: expand to a confirm pill, don't fetch yet
+    setLiveRefreshState('expanded');
+    clearTimeout(liveRefreshAutoCollapseTimer);
+    liveRefreshAutoCollapseTimer = setTimeout(() => {
+      if (liveRefreshState === 'expanded') setLiveRefreshState('idle');
+    }, 4000);
+    return;
+  }
+
+  if (liveRefreshState === 'expanded') {
+    // Second tap (confirm): actually fetch, then disable for the cooldown
+    clearTimeout(liveRefreshAutoCollapseTimer);
+    setLiveRefreshState('cooldown');
+    btn.classList.add('spinning');
+    const loc = LIVE_LOCATIONS.find(l => l.name === lastLiveLocationName) || LIVE_LOCATIONS[0];
+    await selectLiveLocation(loc, true);
+    btn.classList.remove('spinning');
+    setTimeout(() => setLiveRefreshState('idle'), 20000);
+  }
+});
+
+// Tapping anywhere else collapses an unconfirmed expanded pill, same
+// dismiss-on-outside-tap pattern used elsewhere on the site.
+document.addEventListener('click', () => {
+  if (liveRefreshState === 'expanded') {
+    clearTimeout(liveRefreshAutoCollapseTimer);
+    setLiveRefreshState('idle');
+  }
+});
+
 document.getElementById('updateToastRefresh').addEventListener('click', () => {
   document.getElementById('updateToast').hidden = true;
   manualRefresh();
