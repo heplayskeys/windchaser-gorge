@@ -1,29 +1,41 @@
 {
-  "generated_at": "2026-08-15T17:29:01.899958+00:00",
+  "generated_at": "2026-08-14T16:23:44.239001+00:00",
   "sources": [
     {
       "source": "Victor the Inflictor",
       "url": "https://victortheinflictor.com",
       "credibility": "40+ years reading Gorge wind",
-      "ai_summary": "Expect good west winds of 22 to 25+ mph in the Gorge today, though afternoon thunderstorms could impact wind speeds.",
+      "ai_summary": "Light, hazy conditions today with wind topping out near 10-15mph, picking up modestly by evening near Stevenson and Viento.",
       "zones": [],
       "flags": [
         {
           "label": "Smoke / Haze",
           "level": "caution",
-          "context": "\u2026Ctor wind predictor 6:30 AM ... clouds inland to Stevenson..hazy out east ...south onshore flow 40 yrs experience... venmo @\u2026",
-          "where": "Stevenson"
+          "context": "Hazy skies strong wind is done until the weekend as gradients ha\u2026",
+          "where": null
         }
       ],
-      "mph_mentions": [],
-      "time_segments": [],
+      "mph_mentions": [
+        {
+          "range": "10-15MPH",
+          "where": "Stevenson, Viento",
+          "context": "\u2026N cancelling the thermal gradient ...and wind to maybe 10-15 MPH at best ...picks up late day from Stevenson / Viento t\u2026"
+        }
+      ],
+      "time_segments": [
+        {
+          "period": "Afternoon",
+          "low": 10,
+          "high": 15
+        }
+      ],
       "zone_periods": []
     },
     {
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
-      "ai_summary": "Expect steady west winds of 17-20 mph today between Viento and Hood River, with a possible brief morning lull.",
+      "ai_summary": "Expect an upgrade this afternoon with 21-24mph winds from Stevenson to Doug's, and 17-20mph at the Hatch, marking the last day of west wind before a heat wave.",
       "zones": [
         {
           "zone": "Stevenson",
@@ -34,6 +46,11 @@
           "zone": "Viento",
           "low": 16,
           "high": 25
+        },
+        {
+          "zone": "The Hatch",
+          "low": 17,
+          "high": 20
         },
         {
           "zone": "Lyle",
@@ -56,27 +73,34 @@
           "high": 25
         }
       ],
-      "flags": [],
+      "flags": [
+        {
+          "label": "Fire Danger",
+          "level": "warning",
+          "context": "\u2026-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+          "where": "Lyle, Stevenson, the Hatch"
+        }
+      ],
       "mph_mentions": [
         {
           "range": "16-19mph",
           "where": "Hood River, Viento",
-          "context": "\u202630.12/30.02/30.01 With 1026mb offshore. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso\u2026"
+          "context": "\u2026D off with clear sky across the region. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso\u2026"
         },
         {
           "range": "7-10mph",
           "where": "Hood River, Rowena, Stevenson, Viento",
-          "context": "\u2026Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone with light/variable w\u2026"
+          "context": "\u2026Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone. in the afternoon, of\u2026"
+        },
+        {
+          "range": "21-24mph",
+          "where": "Lyle, Stevenson, the Hatch",
+          "context": "\u2026Ore high pressure strengthens. this gives us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. r\u2026"
         },
         {
           "range": "17-20mph",
-          "where": "Hood River, Viento, the Dalles",
-          "context": "\u2026Light/variable wind east of the Dalles. models suggest 17-20mph pretty much all day between Viento and Hood River with\u2026"
-        },
-        {
-          "range": "14-17mph",
-          "where": "Hood River, Viento, the Hatch",
-          "context": "\u2026Ween Viento and Hood River with a late morning lull to 14-17mph possible at the Hatch."
+          "where": "Lyle, Stevenson, the Hatch",
+          "context": "\u2026Es us a shot at 21-24mph from Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger con\u2026"
         }
       ],
       "time_segments": [
@@ -86,9 +110,9 @@
           "high": 19
         },
         {
-          "period": "Morning",
-          "low": 14,
-          "high": 20
+          "period": "Afternoon",
+          "low": 17,
+          "high": 24
         }
       ],
       "zone_periods": [
@@ -106,6 +130,24 @@
         },
         {
           "zone": "Stevenson",
+          "period": "Afternoon",
+          "low": 21,
+          "high": 25
+        },
+        {
+          "zone": "Lyle",
+          "period": "Afternoon",
+          "low": 21,
+          "high": 29
+        },
+        {
+          "zone": "The Hatch",
+          "period": "Afternoon",
+          "low": 17,
+          "high": 20
+        },
+        {
+          "zone": "Stevenson",
           "period": "Dawn",
           "low": 13,
           "high": 16
@@ -115,12 +157,6 @@
           "period": "Morning",
           "low": 17,
           "high": 20
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Afternoon",
-          "low": 22,
-          "high": 25
         },
         {
           "zone": "Stevenson",
@@ -190,12 +226,6 @@
         },
         {
           "zone": "Lyle",
-          "period": "Afternoon",
-          "low": 26,
-          "high": 29
-        },
-        {
-          "zone": "Lyle",
           "period": "Evening",
           "low": 22,
           "high": 25
@@ -259,6 +289,12 @@
       "confirmed_by_both": true
     },
     {
+      "zone": "The Hatch",
+      "low": 17,
+      "high": 20,
+      "confirmed_by_both": false
+    },
+    {
       "zone": "Lyle",
       "low": 14,
       "high": 29,
@@ -283,6 +319,81 @@
       "confirmed_by_both": false
     }
   ],
+  "flags": [
+    {
+      "label": "Smoke / Haze",
+      "level": "caution",
+      "context": "Hazy skies strong wind is done until the weekend as gradients ha\u2026",
+      "where": null
+    },
+    {
+      "label": "Fire Danger",
+      "level": "warning",
+      "context": "\u2026-24mph From Stevenson to Doug's with 17-20mph at the Hatch. red flag warning as high fire danger continues.",
+      "where": "Lyle, Stevenson, the Hatch"
+    }
+  ],
+  "agreement_zones": [
+    "Stevenson",
+    "Viento"
+  ],
+  "direction": "westerly",
+  "weekly_outlook": [
+    {
+      "day": "Fri",
+      "low": 7,
+      "high": 29,
+      "direction": "westerly"
+    },
+    {
+      "day": "Sat",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Sun",
+      "low": 17,
+      "high": 25,
+      "direction": null
+    },
+    {
+      "day": "Mon",
+      "low": 22,
+      "high": 25,
+      "direction": null
+    },
+    {
+      "day": "Tue",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Wed",
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Thu",
+      "low": null,
+      "high": null,
+      "direction": null
+    }
+  ],
+  "time_segments": [
+    {
+      "period": "Early",
+      "low": 7,
+      "high": 19
+    },
+    {
+      "period": "Afternoon",
+      "low": 10,
+      "high": 24
+    }
+  ],
   "zone_periods": [
     {
       "zone": "Viento",
@@ -298,6 +409,24 @@
     },
     {
       "zone": "Stevenson",
+      "period": "Afternoon",
+      "low": 21,
+      "high": 25
+    },
+    {
+      "zone": "Lyle",
+      "period": "Afternoon",
+      "low": 21,
+      "high": 29
+    },
+    {
+      "zone": "The Hatch",
+      "period": "Afternoon",
+      "low": 17,
+      "high": 20
+    },
+    {
+      "zone": "Stevenson",
       "period": "Dawn",
       "low": 13,
       "high": 16
@@ -307,12 +436,6 @@
       "period": "Morning",
       "low": 17,
       "high": 20
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Afternoon",
-      "low": 22,
-      "high": 25
     },
     {
       "zone": "Stevenson",
@@ -382,12 +505,6 @@
     },
     {
       "zone": "Lyle",
-      "period": "Afternoon",
-      "low": 26,
-      "high": 29
-    },
-    {
-      "zone": "Lyle",
       "period": "Evening",
       "low": 22,
       "high": 25
@@ -435,73 +552,335 @@
       "high": 25
     }
   ],
-  "time_segments": [
+  "weekly_location_forecast": [
     {
-      "period": "Early",
       "low": 7,
-      "high": 19
+      "high": 21,
+      "avgKn": 13.9,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 7,
+          "high": 15
+        },
+        {
+          "zone": "Stevenson",
+          "low": 8,
+          "high": 16
+        },
+        {
+          "zone": "Viento",
+          "low": 9,
+          "high": 17
+        },
+        {
+          "zone": "Mosier",
+          "low": 9,
+          "high": 17
+        },
+        {
+          "zone": "The Dalles",
+          "low": 10,
+          "high": 18
+        },
+        {
+          "zone": "Lyle",
+          "low": 11,
+          "high": 19
+        },
+        {
+          "zone": "Rufus",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Arlington",
+          "low": 13,
+          "high": 21
+        }
+      ]
     },
     {
-      "period": "Morning",
+      "low": 8,
+      "high": 22,
+      "avgKn": 15.1,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 8,
+          "high": 16
+        },
+        {
+          "zone": "Stevenson",
+          "low": 9,
+          "high": 17
+        },
+        {
+          "zone": "Viento",
+          "low": 10,
+          "high": 18
+        },
+        {
+          "zone": "Mosier",
+          "low": 11,
+          "high": 19
+        },
+        {
+          "zone": "The Dalles",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Lyle",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Rufus",
+          "low": 13,
+          "high": 21
+        },
+        {
+          "zone": "Arlington",
+          "low": 14,
+          "high": 22
+        }
+      ]
+    },
+    {
+      "low": 10,
+      "high": 24,
+      "avgKn": 16.9,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 10,
+          "high": 18
+        },
+        {
+          "zone": "Stevenson",
+          "low": 11,
+          "high": 19
+        },
+        {
+          "zone": "Viento",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Mosier",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "The Dalles",
+          "low": 13,
+          "high": 21
+        },
+        {
+          "zone": "Lyle",
+          "low": 14,
+          "high": 22
+        },
+        {
+          "zone": "Rufus",
+          "low": 15,
+          "high": 23
+        },
+        {
+          "zone": "Arlington",
+          "low": 16,
+          "high": 24
+        }
+      ]
+    },
+    {
+      "low": 12,
+      "high": 25,
+      "avgKn": 18.4,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Stevenson",
+          "low": 12,
+          "high": 20
+        },
+        {
+          "zone": "Viento",
+          "low": 13,
+          "high": 21
+        },
+        {
+          "zone": "Mosier",
+          "low": 14,
+          "high": 22
+        },
+        {
+          "zone": "The Dalles",
+          "low": 15,
+          "high": 23
+        },
+        {
+          "zone": "Lyle",
+          "low": 16,
+          "high": 24
+        },
+        {
+          "zone": "Rufus",
+          "low": 16,
+          "high": 24
+        },
+        {
+          "zone": "Arlington",
+          "low": 17,
+          "high": 25
+        }
+      ]
+    },
+    {
+      "low": 13,
+      "high": 27,
+      "avgKn": 19.9,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 13,
+          "high": 21
+        },
+        {
+          "zone": "Stevenson",
+          "low": 14,
+          "high": 22
+        },
+        {
+          "zone": "Viento",
+          "low": 15,
+          "high": 23
+        },
+        {
+          "zone": "Mosier",
+          "low": 15,
+          "high": 23
+        },
+        {
+          "zone": "The Dalles",
+          "low": 16,
+          "high": 24
+        },
+        {
+          "zone": "Lyle",
+          "low": 17,
+          "high": 25
+        },
+        {
+          "zone": "Rufus",
+          "low": 18,
+          "high": 26
+        },
+        {
+          "zone": "Arlington",
+          "low": 19,
+          "high": 27
+        }
+      ]
+    },
+    {
       "low": 14,
-      "high": 20
-    }
-  ],
-  "flags": [
-    {
-      "label": "Smoke / Haze",
-      "level": "caution",
-      "context": "\u2026Ctor wind predictor 6:30 AM ... clouds inland to Stevenson..hazy out east ...south onshore flow 40 yrs experience... venmo @\u2026",
-      "where": "Stevenson"
-    }
-  ],
-  "agreement_zones": [
-    "Stevenson",
-    "Viento"
-  ],
-  "direction": "westerly",
-  "weekly_outlook": [
-    {
-      "day": "Sat",
-      "low": 7,
-      "high": 29,
-      "direction": "westerly"
+      "high": 28,
+      "avgKn": 21.1,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 14,
+          "high": 22
+        },
+        {
+          "zone": "Stevenson",
+          "low": 15,
+          "high": 23
+        },
+        {
+          "zone": "Viento",
+          "low": 16,
+          "high": 24
+        },
+        {
+          "zone": "Mosier",
+          "low": 17,
+          "high": 25
+        },
+        {
+          "zone": "The Dalles",
+          "low": 18,
+          "high": 26
+        },
+        {
+          "zone": "Lyle",
+          "low": 18,
+          "high": 26
+        },
+        {
+          "zone": "Rufus",
+          "low": 19,
+          "high": 27
+        },
+        {
+          "zone": "Arlington",
+          "low": 20,
+          "high": 28
+        }
+      ]
     },
     {
-      "day": "Sun",
-      "low": 17,
-      "high": 25,
-      "direction": null
-    },
-    {
-      "day": "Mon",
-      "low": 22,
-      "high": 25,
-      "direction": null
-    },
-    {
-      "day": "Tue",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Wed",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Thu",
-      "low": null,
-      "high": null,
-      "direction": null
-    },
-    {
-      "day": "Fri",
-      "low": null,
-      "high": null,
-      "direction": null
+      "low": 16,
+      "high": 30,
+      "avgKn": 22.9,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 16,
+          "high": 24
+        },
+        {
+          "zone": "Stevenson",
+          "low": 17,
+          "high": 25
+        },
+        {
+          "zone": "Viento",
+          "low": 18,
+          "high": 26
+        },
+        {
+          "zone": "Mosier",
+          "low": 18,
+          "high": 26
+        },
+        {
+          "zone": "The Dalles",
+          "low": 19,
+          "high": 27
+        },
+        {
+          "zone": "Lyle",
+          "low": 20,
+          "high": 28
+        },
+        {
+          "zone": "Rufus",
+          "low": 21,
+          "high": 29
+        },
+        {
+          "zone": "Arlington",
+          "low": 22,
+          "high": 30
+        }
+      ]
     }
   ]
 }

@@ -1419,84 +1419,6 @@ const LIVE_LOCATIONS = [
 
 const LIVE_CACHE_TTL_MS = 12 * 60 * 60 * 1000; // matches the 12h sparkline window
 
-// Fetches 7 days of hourly wind speed for every known location, used to
-// build genuine per-location weekly outlook data (future days don't get
-// this from Victor/Temira's prose, which only ever gives one blended range
-// per day with no zone attribution — Open-Meteo gives us real per-spot
-// numbers instead, same way we already use it for Live Model Data).
-async function fetchWeeklyLocationForecasts() {
-  const cacheKey = 'weeklyLocationForecasts';
-  try {
-    const raw = sessionStorage.getItem(cacheKey);
-    if (raw) {
-      const { data, timestamp } = JSON.parse(raw);
-      if (Date.now() - timestamp < LIVE_CACHE_TTL_MS) return data;
-    }
-  } catch (e) {}
-
-  const results = {};
-  await Promise.all(LIVE_LOCATIONS.map(async (loc) => {
-    try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}` +
-        `&hourly=wind_speed_10m&wind_speed_unit=kn&timezone=auto&forecast_days=7`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error('open-meteo unavailable');
-      const json = await res.json();
-      results[loc.name] = json.hourly || null;
-    } catch (e) {
-      results[loc.name] = null;
-    }
-  }));
-
-  try { sessionStorage.setItem(cacheKey, JSON.stringify({ data: results, timestamp: Date.now() })); } catch (e) {}
-  return results;
-}
-
-// Collapses the 8-location hourly data into one entry per calendar date:
-// each location's own low/high for that day, a "typical" value (average of
-// each location's own average, then averaged across locations — the
-// weighting approach requested), and the overall span across all locations
-// for the displayed range.
-function aggregateWeeklyForecast(locationData) {
-  const byDate = {};
-  for (const locName in locationData) {
-    const d = locationData[locName];
-    if (!d || !d.time) continue;
-    d.time.forEach((t, i) => {
-      const dateStr = t.slice(0, 10);
-      const speed = d.wind_speed_10m[i];
-      if (speed == null) return;
-      if (!byDate[dateStr]) byDate[dateStr] = {};
-      if (!byDate[dateStr][locName]) {
-        byDate[dateStr][locName] = { low: speed, high: speed };
-      } else {
-        byDate[dateStr][locName].low = Math.min(byDate[dateStr][locName].low, speed);
-        byDate[dateStr][locName].high = Math.max(byDate[dateStr][locName].high, speed);
-      }
-    });
-  }
-
-  const result = {};
-  for (const dateStr in byDate) {
-    const perLoc = byDate[dateStr];
-    const zones = Object.keys(perLoc).map(name => ({
-      zone: name.split(',')[0],
-      low: Math.round(perLoc[name].low),
-      high: Math.round(perLoc[name].high),
-    }));
-    if (!zones.length) continue;
-    const locAvgs = zones.map(z => (z.low + z.high) / 2);
-    const avgKn = locAvgs.reduce((a, b) => a + b, 0) / locAvgs.length;
-    result[dateStr] = {
-      low: Math.min(...zones.map(z => z.low)),
-      high: Math.max(...zones.map(z => z.high)),
-      avgKn,
-      zones,
-    };
-  }
-  return result;
-}
-
 function getCachedLive(lat, lon) {
   try {
     const raw = sessionStorage.getItem(`live_${lat}_${lon}`);
@@ -1735,18 +1657,20 @@ function renderLive(data, locationName) {
   sub.textContent = `${locationName || 'Swell City, OR'} · Open-Meteo forecast model`;
   const c = data.current;
 
-  renderStatsBlock(liveNowIdx, statsLabel(liveNowIdx), {
-    speed: c.wind_speed_10m, gust: c.wind_gusts_10m, dir: c.wind_direction_10m, temp: c.temperature_2m,
-  });
+  if (currentPeriodKey === 'Now') {
+    renderStatsBlock(liveNowIdx, statsLabel(liveNowIdx), {
+      speed: c.wind_speed_10m, gust: c.wind_gusts_10m, dir: c.wind_direction_10m, temp: c.temperature_2m,
+    });
+  }
 
-  // Reset the picker to 'Now' on fresh data (new location fetch)
-  const rangeLabel = document.getElementById('liveRangeTriggerLabel');
-  if (rangeLabel) rangeLabel.textContent = 'Now';
-  document.querySelectorAll('#liveRangeMenu button').forEach(b => b.classList.toggle('active', b.dataset.period === 'Now'));
-
+  // Keep whatever period was already selected (Now, Dawn, Afternoon, etc.)
+  // — only the location changes here, not the time window you were looking at.
   const speeds = (data.hourly && data.hourly.wind_speed_10m || []);
   if (!speeds.length) { spark.innerHTML = ''; return; }
-  renderLiveChart('Now');
+  renderLiveChart(currentPeriodKey);
+  if (currentPeriodKey !== 'Now') {
+    renderStatsBlock(currentChartStartIdx, statsLabel(currentChartStartIdx));
+  }
 }
 
 function formatHourLabel(isoString) {
@@ -2157,7 +2081,7 @@ function outlookDayHTML(d, idx) {
     </button>`;
 }
 
-async function renderOutlook(days, fallbackDirection) {
+function renderOutlook(days, fallbackDirection, weeklyLocationForecast) {
   const topRow = document.getElementById('outlookRowTop');
   const bottomRow = document.getElementById('outlookRowBottom');
   currentOutlookDirection = fallbackDirection || 'westerly';
@@ -2167,9 +2091,8 @@ async function renderOutlook(days, fallbackDirection) {
     return;
   }
 
-  const locationData = await fetchWeeklyLocationForecasts();
-  const meteoByDate = aggregateWeeklyForecast(locationData);
   const todayZones = (currentData && currentData.zones) || [];
+  const meteoByIdx = weeklyLocationForecast || [];
 
   currentOutlookDays = days.map((d, idx) => {
     if (idx === 0) {
@@ -2184,9 +2107,8 @@ async function renderOutlook(days, fallbackDirection) {
         source: 'scraped', zonesKn,
       };
     }
-    // Future days: Open-Meteo per-location data, keyed by actual calendar date
-    const dateStr = new Date(Date.now() + idx * 86400000).toISOString().slice(0, 10);
-    const agg = meteoByDate[dateStr];
+    // Future days: pre-computed Open-Meteo per-location data from the daily scrape
+    const agg = meteoByIdx[idx];
     if (agg) {
       return {
         day: d.day, direction: d.direction,
@@ -2216,7 +2138,7 @@ function openOutlookModal(idx) {
   const sourceLabel = d.source === 'scraped'
     ? 'Source: Victor the Inflictor &amp; The Gorge Is My Gym (Temira)'
     : d.source === 'meteo'
-      ? 'Source: Open-Meteo forecast model'
+      ? `Source: Open-Meteo forecast model · Updated ${currentData && currentData.generated_at ? formatScrapedDate(currentData.generated_at) : 'recently'}`
       : '';
 
   let zonesHTML = '';
@@ -2380,7 +2302,7 @@ function render(data) {
   renderBadges(document.getElementById('badgesWrap'), data.flags);
   renderAgreement(data.zones);
   renderLegend();
-  renderOutlook(data.weekly_outlook, data.direction);
+  renderOutlook(data.weekly_outlook, data.direction, data.weekly_location_forecast);
   setupPeriodPicker(data);
   updateGlanceAndZones('All Day');
 

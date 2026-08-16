@@ -24,7 +24,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 from bs4 import BeautifulSoup
@@ -908,6 +908,87 @@ def merge_time_segments(all_segment_lists):
     return [merged[p] for p in PERIOD_ORDER if p in merged]
 
 
+# Same 8 locations the dashboard's Live Model Data section already knows
+# about — kept in sync manually with the LIVE_LOCATIONS array in index.html.
+LIVE_LOCATIONS = [
+    {"name": "Swell City, OR", "lat": 45.7133, "lon": -121.5254},
+    {"name": "Stevenson, WA", "lat": 45.6976, "lon": -121.8934},
+    {"name": "Viento, OR", "lat": 45.7025, "lon": -121.6660},
+    {"name": "Mosier, OR", "lat": 45.6821, "lon": -121.3971},
+    {"name": "The Dalles, OR", "lat": 45.5946, "lon": -121.1787},
+    {"name": "Lyle, WA", "lat": 45.6960, "lon": -121.2860},
+    {"name": "Rufus, OR", "lat": 45.6748, "lon": -120.7256},
+    {"name": "Arlington, OR", "lat": 45.7168, "lon": -120.2103},
+]
+
+
+def fetch_weekly_location_forecast():
+    """
+    Fetches 7 days of hourly wind speed for every known location from the
+    free, no-key Open-Meteo API — used to build the 7-Day Outlook's future
+    days. Victor/Temira's prose only ever gives one blended range per day
+    with no zone attribution for anything beyond today, so this gives real
+    per-spot numbers instead. Moved server-side (once/day) rather than
+    fetched fresh by every browser session — the same 8-location fetch was
+    previously happening client-side on every page load.
+    """
+    location_data = {}
+    for loc in LIVE_LOCATIONS:
+        try:
+            url = (
+                f"https://api.open-meteo.com/v1/forecast?latitude={loc['lat']}&longitude={loc['lon']}"
+                f"&hourly=wind_speed_10m&wind_speed_unit=kn&timezone=auto&forecast_days=7"
+            )
+            resp = requests.get(url, timeout=20)
+            resp.raise_for_status()
+            location_data[loc["name"]] = resp.json().get("hourly")
+        except Exception as e:
+            print(f"WARNING: weekly forecast fetch failed for {loc['name']}: {e}", file=sys.stderr)
+            location_data[loc["name"]] = None
+    return location_data
+
+
+def aggregate_weekly_forecast(location_data):
+    """
+    Collapses per-location hourly data into one entry per calendar date:
+    each location's own low/high for that day, a weighted "typical" value
+    (average of each location's own average, then averaged across
+    locations — not just the raw span's high, which one outlier location
+    could skew), and the overall low/high span across all locations.
+    """
+    by_date = {}
+    for loc_name, hourly in location_data.items():
+        if not hourly or "time" not in hourly:
+            continue
+        for t, speed in zip(hourly["time"], hourly.get("wind_speed_10m", [])):
+            if speed is None:
+                continue
+            date_str = t[:10]
+            by_date.setdefault(date_str, {})
+            if loc_name not in by_date[date_str]:
+                by_date[date_str][loc_name] = {"low": speed, "high": speed}
+            else:
+                by_date[date_str][loc_name]["low"] = min(by_date[date_str][loc_name]["low"], speed)
+                by_date[date_str][loc_name]["high"] = max(by_date[date_str][loc_name]["high"], speed)
+
+    result = {}
+    for date_str, per_loc in by_date.items():
+        zones = [
+            {"zone": name.split(",")[0], "low": round(vals["low"]), "high": round(vals["high"])}
+            for name, vals in per_loc.items()
+        ]
+        if not zones:
+            continue
+        loc_avgs = [(z["low"] + z["high"]) / 2 for z in zones]
+        result[date_str] = {
+            "low": min(z["low"] for z in zones),
+            "high": max(z["high"] for z in zones),
+            "avgKn": round(sum(loc_avgs) / len(loc_avgs), 1),
+            "zones": zones,
+        }
+    return result
+
+
 def main():
     result = {"generated_at": datetime.now(timezone.utc).isoformat(), "sources": []}
 
@@ -946,6 +1027,23 @@ def main():
     today_low = min(today_lows) if today_lows else None
     today_high = max(today_highs) if today_highs else None
     result["weekly_outlook"] = build_weekly_outlook(daily, today_low, today_high, result["direction"])
+
+    # 7-Day Outlook's future days: real per-location Open-Meteo data. Today's
+    # own zone breakdown already comes from the scrape above (result["zones"]);
+    # this only fills in days 1-6, which prose alone can't give per-spot detail
+    # for. Wrapped defensively — any failure just yields an empty array, and
+    # the dashboard already handles missing future-day data gracefully.
+    try:
+        location_data = fetch_weekly_location_forecast()
+        agg_by_date = aggregate_weekly_forecast(location_data)
+        today_date = datetime.now(timezone.utc).date()
+        result["weekly_location_forecast"] = [
+            agg_by_date.get((today_date + timedelta(days=i)).isoformat())
+            for i in range(7)
+        ]
+    except Exception as e:
+        print(f"WARNING: weekly location forecast failed: {e}", file=sys.stderr)
+        result["weekly_location_forecast"] = []
 
     # strip internal-only fields before writing
     for s in result["sources"]:
