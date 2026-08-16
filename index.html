@@ -369,9 +369,11 @@
     text-align: center;
     cursor: pointer;
     font: inherit;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
   }
-  .outlook-day.empty { cursor: default; }
-  .outlook-expand-icon { position: absolute; top: 5px; right: 5px; width: 12px; height: 12px; opacity: 0.7; }
+  .outlook-day:active { transform: scale(0.96); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .outlook-day.empty { cursor: default; box-shadow: none; }
   .outlook-day .dname { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap { display: flex; align-items: center; justify-content: center; gap: 0.2rem; margin-bottom: 0.35rem; }
   .outlook-day .arrow-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; }
@@ -2244,7 +2246,6 @@ function outlookDayHTML(d, idx) {
   const band = windBand(d.avgKn != null ? d.avgKn : d.hiKn);
   return `
     <button type="button" class="outlook-day" data-day-idx="${idx}" style="background:${band.color};border-color:${band.color}">
-      <svg class="outlook-expand-icon" viewBox="0 0 24 24" style="color:${band.ink}"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <div class="dname" style="color:${band.ink}">${d.day}</div>
       <div class="arrow-wrap">
         <svg viewBox="0 0 24 24" style="transform:rotate(${deg}deg)">
