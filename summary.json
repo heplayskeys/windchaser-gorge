@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-17T16:54:00.115141+00:00",
+  "generated_at": "2026-08-18T16:59:56.722115+00:00",
   "sources": [
     {
       "source": "Victor the Inflictor",
@@ -16,428 +16,43 @@
       "source": "The Gorge Is My Gym (Temira)",
       "url": "https://thegorgeismygym.com/forecast",
       "credibility": "Hyperlocal Gorge forecaster since 2006",
-      "ai_summary": "Expect steady west winds of 17-20 mph today between Viento and Hood River, with a possible late morning lull.",
-      "zones": [
-        {
-          "zone": "Stevenson",
-          "low": 7,
-          "high": 25
-        },
-        {
-          "zone": "Viento",
-          "low": 16,
-          "high": 25
-        },
-        {
-          "zone": "Lyle",
-          "low": 14,
-          "high": 29
-        },
-        {
-          "zone": "Swell City",
-          "low": 17,
-          "high": 25
-        },
-        {
-          "zone": "Rufus",
-          "low": 10,
-          "high": 29
-        },
-        {
-          "zone": "Roosevelt",
-          "low": 10,
-          "high": 25
-        }
-      ],
+      "ai_summary": "Today offers strong kiteboarding wind reaching 24-27 mph from Viento to Hood River, extending toward Rufus with possible gusts up to 29 mph.",
+      "zones": [],
       "flags": [],
       "mph_mentions": [
         {
-          "range": "16-19mph",
-          "where": "Hood River, Viento",
-          "context": "\u202630.12/30.02/30.01 With 1026mb offshore. early wind was 16-19mph between Viento and Hood River with 7-10mph at stevenso\u2026"
-        },
-        {
-          "range": "7-10mph",
-          "where": "Hood River, Rowena, Stevenson, Viento",
-          "context": "\u2026Y wind was 16-19mph between Viento and Hood River with 7-10mph at Stevenson and the Rowena zone with light/variable w\u2026"
-        },
-        {
-          "range": "17-20mph",
-          "where": "Hood River, Viento, the Dalles",
-          "context": "\u2026Light/variable wind east of the Dalles. models suggest 17-20mph pretty much all day between Viento and Hood River with\u2026"
+          "range": "20-23mph",
+          "where": "Arlington, Hood River, Mosier",
+          "context": "\u2026Venson slowly building. Hood River to Mosier climbs to 20-23mph with 14-17mph east of Mosier to Arlington. a period of\u2026"
         },
         {
           "range": "14-17mph",
-          "where": "Hood River, Viento, the Hatch",
-          "context": "\u2026Ween Viento and Hood River with a late morning lull to 14-17mph possible at the Hatch."
+          "where": "Arlington, Hood River, Mosier",
+          "context": "\u2026Building. Hood River to Mosier climbs to 20-23mph with 14-17mph east of Mosier to Arlington. a period of 26-29mph is p\u2026"
+        },
+        {
+          "range": "26-29mph",
+          "where": "Arlington, Mosier, Viento",
+          "context": "\u2026With 14-17mph east of Mosier to Arlington. a period of 26-29mph is possible, but not promised, between Viento and the\u2026"
         }
       ],
       "time_segments": [
         {
-          "period": "Early",
-          "low": 7,
-          "high": 19
-        },
-        {
           "period": "Morning",
           "low": 14,
-          "high": 20
+          "high": 29
         }
       ],
-      "zone_periods": [
-        {
-          "zone": "Viento",
-          "period": "Early",
-          "low": 16,
-          "high": 19
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Early",
-          "low": 7,
-          "high": 10
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Dawn",
-          "low": 13,
-          "high": 16
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Morning",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Afternoon",
-          "low": 22,
-          "high": 25
-        },
-        {
-          "zone": "Stevenson",
-          "period": "Evening",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Viento",
-          "period": "Dawn",
-          "low": 20,
-          "high": 23
-        },
-        {
-          "zone": "Viento",
-          "period": "Morning",
-          "low": 22,
-          "high": 25
-        },
-        {
-          "zone": "Viento",
-          "period": "Afternoon",
-          "low": 20,
-          "high": 23
-        },
-        {
-          "zone": "Viento",
-          "period": "Evening",
-          "low": 22,
-          "high": 25
-        },
-        {
-          "zone": "Swell City",
-          "period": "Dawn",
-          "low": 20,
-          "high": 23
-        },
-        {
-          "zone": "Swell City",
-          "period": "Morning",
-          "low": 22,
-          "high": 25
-        },
-        {
-          "zone": "Swell City",
-          "period": "Afternoon",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Swell City",
-          "period": "Evening",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Lyle",
-          "period": "Dawn",
-          "low": 14,
-          "high": 17
-        },
-        {
-          "zone": "Lyle",
-          "period": "Morning",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Lyle",
-          "period": "Afternoon",
-          "low": 26,
-          "high": 29
-        },
-        {
-          "zone": "Lyle",
-          "period": "Evening",
-          "low": 22,
-          "high": 25
-        },
-        {
-          "zone": "Rufus",
-          "period": "Dawn",
-          "low": 10,
-          "high": 13
-        },
-        {
-          "zone": "Rufus",
-          "period": "Afternoon",
-          "low": 26,
-          "high": 29
-        },
-        {
-          "zone": "Rufus",
-          "period": "Evening",
-          "low": 26,
-          "high": 29
-        },
-        {
-          "zone": "Roosevelt",
-          "period": "Dawn",
-          "low": 10,
-          "high": 13
-        },
-        {
-          "zone": "Roosevelt",
-          "period": "Morning",
-          "low": 13,
-          "high": 16
-        },
-        {
-          "zone": "Roosevelt",
-          "period": "Afternoon",
-          "low": 17,
-          "high": 20
-        },
-        {
-          "zone": "Roosevelt",
-          "period": "Evening",
-          "low": 22,
-          "high": 25
-        }
-      ]
+      "zone_periods": []
     }
   ],
-  "zones": [
-    {
-      "zone": "Stevenson",
-      "low": 7,
-      "high": 25,
-      "confirmed_by_both": false
-    },
-    {
-      "zone": "Viento",
-      "low": 16,
-      "high": 25,
-      "confirmed_by_both": false
-    },
-    {
-      "zone": "Lyle",
-      "low": 14,
-      "high": 29,
-      "confirmed_by_both": false
-    },
-    {
-      "zone": "Swell City",
-      "low": 17,
-      "high": 25,
-      "confirmed_by_both": false
-    },
-    {
-      "zone": "Rufus",
-      "low": 10,
-      "high": 29,
-      "confirmed_by_both": false
-    },
-    {
-      "zone": "Roosevelt",
-      "low": 10,
-      "high": 25,
-      "confirmed_by_both": false
-    }
-  ],
-  "zone_periods": [
-    {
-      "zone": "Viento",
-      "period": "Early",
-      "low": 16,
-      "high": 19
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Early",
-      "low": 7,
-      "high": 10
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Dawn",
-      "low": 13,
-      "high": 16
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Morning",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Afternoon",
-      "low": 22,
-      "high": 25
-    },
-    {
-      "zone": "Stevenson",
-      "period": "Evening",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Viento",
-      "period": "Dawn",
-      "low": 20,
-      "high": 23
-    },
-    {
-      "zone": "Viento",
-      "period": "Morning",
-      "low": 22,
-      "high": 25
-    },
-    {
-      "zone": "Viento",
-      "period": "Afternoon",
-      "low": 20,
-      "high": 23
-    },
-    {
-      "zone": "Viento",
-      "period": "Evening",
-      "low": 22,
-      "high": 25
-    },
-    {
-      "zone": "Swell City",
-      "period": "Dawn",
-      "low": 20,
-      "high": 23
-    },
-    {
-      "zone": "Swell City",
-      "period": "Morning",
-      "low": 22,
-      "high": 25
-    },
-    {
-      "zone": "Swell City",
-      "period": "Afternoon",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Swell City",
-      "period": "Evening",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Lyle",
-      "period": "Dawn",
-      "low": 14,
-      "high": 17
-    },
-    {
-      "zone": "Lyle",
-      "period": "Morning",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Lyle",
-      "period": "Afternoon",
-      "low": 26,
-      "high": 29
-    },
-    {
-      "zone": "Lyle",
-      "period": "Evening",
-      "low": 22,
-      "high": 25
-    },
-    {
-      "zone": "Rufus",
-      "period": "Dawn",
-      "low": 10,
-      "high": 13
-    },
-    {
-      "zone": "Rufus",
-      "period": "Afternoon",
-      "low": 26,
-      "high": 29
-    },
-    {
-      "zone": "Rufus",
-      "period": "Evening",
-      "low": 26,
-      "high": 29
-    },
-    {
-      "zone": "Roosevelt",
-      "period": "Dawn",
-      "low": 10,
-      "high": 13
-    },
-    {
-      "zone": "Roosevelt",
-      "period": "Morning",
-      "low": 13,
-      "high": 16
-    },
-    {
-      "zone": "Roosevelt",
-      "period": "Afternoon",
-      "low": 17,
-      "high": 20
-    },
-    {
-      "zone": "Roosevelt",
-      "period": "Evening",
-      "low": 22,
-      "high": 25
-    }
-  ],
+  "zones": [],
+  "zone_periods": [],
   "time_segments": [
     {
-      "period": "Early",
-      "low": 7,
-      "high": 19
-    },
-    {
       "period": "Morning",
       "low": 14,
-      "high": 20
+      "high": 29
     }
   ],
   "flags": [],
@@ -445,27 +60,21 @@
   "direction": "westerly",
   "weekly_outlook": [
     {
-      "day": "Mon",
-      "low": 7,
-      "high": 29,
-      "direction": "westerly"
-    },
-    {
       "day": "Tue",
       "low": null,
       "high": null,
-      "direction": null
+      "direction": "westerly"
     },
     {
       "day": "Wed",
-      "low": null,
-      "high": null,
+      "low": 14,
+      "high": 24,
       "direction": null
     },
     {
       "day": "Thu",
-      "low": null,
-      "high": null,
+      "low": 10,
+      "high": 20,
       "direction": null
     },
     {
@@ -482,328 +91,131 @@
     },
     {
       "day": "Sun",
-      "low": 17,
-      "high": 25,
+      "low": null,
+      "high": null,
+      "direction": null
+    },
+    {
+      "day": "Mon",
+      "low": null,
+      "high": null,
       "direction": null
     }
   ],
   "weekly_location_forecast": [
     {
       "low": 1,
-      "high": 14,
-      "avgKn": 8.1,
+      "high": 16,
+      "avgKn": 9.5,
       "zones": [
         {
           "zone": "Swell City",
-          "low": 4,
-          "high": 13
+          "low": 3,
+          "high": 16
         },
         {
           "zone": "Stevenson",
-          "low": 3,
-          "high": 13
+          "low": 4,
+          "high": 14
         },
         {
           "zone": "Viento",
           "low": 8,
-          "high": 12
-        },
-        {
-          "zone": "Mosier",
-          "low": 6,
-          "high": 13
+          "high": 14
         },
         {
           "zone": "The Dalles",
           "low": 1,
-          "high": 14
+          "high": 15
         },
         {
           "zone": "Lyle",
-          "low": 4,
-          "high": 13
+          "low": 1,
+          "high": 15
         },
         {
           "zone": "Rufus",
-          "low": 4,
-          "high": 11
+          "low": 7,
+          "high": 14
         },
         {
           "zone": "Arlington",
-          "low": 1,
-          "high": 9
+          "low": 7,
+          "high": 14
         }
       ]
     },
     {
       "low": 0,
-      "high": 17,
-      "avgKn": 10.1,
+      "high": 13,
+      "avgKn": 7.9,
       "zones": [
         {
           "zone": "Swell City",
-          "low": 5,
-          "high": 16
+          "low": 6,
+          "high": 13
         },
         {
           "zone": "Stevenson",
-          "low": 4,
-          "high": 14
+          "low": 3,
+          "high": 13
         },
         {
           "zone": "Viento",
-          "low": 7,
-          "high": 14
-        },
-        {
-          "zone": "Mosier",
           "low": 8,
-          "high": 16
+          "high": 12
         },
         {
           "zone": "The Dalles",
           "low": 0,
-          "high": 16
+          "high": 12
         },
         {
           "zone": "Lyle",
-          "low": 3,
-          "high": 17
+          "low": 0,
+          "high": 12
         },
         {
           "zone": "Rufus",
           "low": 6,
-          "high": 15
-        },
-        {
-          "zone": "Arlington",
-          "low": 4,
-          "high": 16
-        }
-      ]
-    },
-    {
-      "low": 2,
-      "high": 14,
-      "avgKn": 7.7,
-      "zones": [
-        {
-          "zone": "Swell City",
-          "low": 4,
           "high": 11
         },
         {
-          "zone": "Stevenson",
-          "low": 4,
-          "high": 7
-        },
-        {
-          "zone": "Viento",
+          "zone": "Arlington",
           "low": 4,
           "high": 10
-        },
-        {
-          "zone": "Mosier",
-          "low": 4,
-          "high": 14
-        },
-        {
-          "zone": "The Dalles",
-          "low": 2,
-          "high": 12
-        },
-        {
-          "zone": "Lyle",
-          "low": 3,
-          "high": 13
-        },
-        {
-          "zone": "Rufus",
-          "low": 6,
-          "high": 12
-        },
-        {
-          "zone": "Arlington",
-          "low": 5,
-          "high": 12
         }
       ]
     },
     {
       "low": 2,
-      "high": 10,
-      "avgKn": 6.1,
-      "zones": [
-        {
-          "zone": "Swell City",
-          "low": 3,
-          "high": 9
-        },
-        {
-          "zone": "Stevenson",
-          "low": 3,
-          "high": 7
-        },
-        {
-          "zone": "Viento",
-          "low": 3,
-          "high": 8
-        },
-        {
-          "zone": "Mosier",
-          "low": 3,
-          "high": 8
-        },
-        {
-          "zone": "The Dalles",
-          "low": 2,
-          "high": 10
-        },
-        {
-          "zone": "Lyle",
-          "low": 3,
-          "high": 9
-        },
-        {
-          "zone": "Rufus",
-          "low": 6,
-          "high": 10
-        },
-        {
-          "zone": "Arlington",
-          "low": 4,
-          "high": 9
-        }
-      ]
-    },
-    {
-      "low": 3,
-      "high": 17,
-      "avgKn": 9.0,
-      "zones": [
-        {
-          "zone": "Swell City",
-          "low": 4,
-          "high": 13
-        },
-        {
-          "zone": "Stevenson",
-          "low": 3,
-          "high": 9
-        },
-        {
-          "zone": "Viento",
-          "low": 4,
-          "high": 12
-        },
-        {
-          "zone": "Mosier",
-          "low": 4,
-          "high": 12
-        },
-        {
-          "zone": "The Dalles",
-          "low": 4,
-          "high": 17
-        },
-        {
-          "zone": "Lyle",
-          "low": 4,
-          "high": 15
-        },
-        {
-          "zone": "Rufus",
-          "low": 7,
-          "high": 14
-        },
-        {
-          "zone": "Arlington",
-          "low": 5,
-          "high": 17
-        }
-      ]
-    },
-    {
-      "low": 5,
-      "high": 18,
-      "avgKn": 10.6,
-      "zones": [
-        {
-          "zone": "Swell City",
-          "low": 5,
-          "high": 14
-        },
-        {
-          "zone": "Stevenson",
-          "low": 5,
-          "high": 9
-        },
-        {
-          "zone": "Viento",
-          "low": 6,
-          "high": 13
-        },
-        {
-          "zone": "Mosier",
-          "low": 5,
-          "high": 14
-        },
-        {
-          "zone": "The Dalles",
-          "low": 5,
-          "high": 18
-        },
-        {
-          "zone": "Lyle",
-          "low": 6,
-          "high": 16
-        },
-        {
-          "zone": "Rufus",
-          "low": 10,
-          "high": 17
-        },
-        {
-          "zone": "Arlington",
-          "low": 9,
-          "high": 18
-        }
-      ]
-    },
-    {
-      "low": 3,
       "high": 12,
-      "avgKn": 7.3,
+      "avgKn": 6.6,
       "zones": [
         {
           "zone": "Swell City",
-          "low": 4,
-          "high": 11
+          "low": 3,
+          "high": 10
         },
         {
           "zone": "Stevenson",
-          "low": 3,
+          "low": 2,
           "high": 7
         },
         {
           "zone": "Viento",
           "low": 4,
-          "high": 10
-        },
-        {
-          "zone": "Mosier",
-          "low": 4,
-          "high": 10
+          "high": 9
         },
         {
           "zone": "The Dalles",
-          "low": 4,
-          "high": 11
+          "low": 2,
+          "high": 12
         },
         {
           "zone": "Lyle",
-          "low": 4,
-          "high": 12
+          "low": 2,
+          "high": 11
         },
         {
           "zone": "Rufus",
@@ -812,8 +224,176 @@
         },
         {
           "zone": "Arlington",
+          "low": 4,
+          "high": 8
+        }
+      ]
+    },
+    {
+      "low": 1,
+      "high": 21,
+      "avgKn": 6.9,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 3,
+          "high": 6
+        },
+        {
+          "zone": "Stevenson",
+          "low": 2,
+          "high": 6
+        },
+        {
+          "zone": "Viento",
+          "low": 3,
+          "high": 6
+        },
+        {
+          "zone": "The Dalles",
+          "low": 4,
+          "high": 12
+        },
+        {
+          "zone": "Lyle",
+          "low": 4,
+          "high": 9
+        },
+        {
+          "zone": "Rufus",
+          "low": 4,
+          "high": 15
+        },
+        {
+          "zone": "Arlington",
+          "low": 1,
+          "high": 21
+        }
+      ]
+    },
+    {
+      "low": 4,
+      "high": 17,
+      "avgKn": 9.7,
+      "zones": [
+        {
+          "zone": "Swell City",
           "low": 5,
+          "high": 12
+        },
+        {
+          "zone": "Stevenson",
+          "low": 4,
+          "high": 9
+        },
+        {
+          "zone": "Viento",
+          "low": 5,
+          "high": 11
+        },
+        {
+          "zone": "The Dalles",
+          "low": 5,
+          "high": 17
+        },
+        {
+          "zone": "Lyle",
+          "low": 5,
+          "high": 15
+        },
+        {
+          "zone": "Rufus",
+          "low": 8,
+          "high": 15
+        },
+        {
+          "zone": "Arlington",
+          "low": 8,
+          "high": 17
+        }
+      ]
+    },
+    {
+      "low": 0,
+      "high": 10,
+      "avgKn": 3.2,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 1,
+          "high": 4
+        },
+        {
+          "zone": "Stevenson",
+          "low": 1,
+          "high": 4
+        },
+        {
+          "zone": "Viento",
+          "low": 0,
+          "high": 5
+        },
+        {
+          "zone": "The Dalles",
+          "low": 0,
+          "high": 5
+        },
+        {
+          "zone": "Lyle",
+          "low": 1,
+          "high": 4
+        },
+        {
+          "zone": "Rufus",
+          "low": 1,
           "high": 10
+        },
+        {
+          "zone": "Arlington",
+          "low": 1,
+          "high": 8
+        }
+      ]
+    },
+    {
+      "low": 0,
+      "high": 9,
+      "avgKn": 4.7,
+      "zones": [
+        {
+          "zone": "Swell City",
+          "low": 2,
+          "high": 9
+        },
+        {
+          "zone": "Stevenson",
+          "low": 2,
+          "high": 7
+        },
+        {
+          "zone": "Viento",
+          "low": 2,
+          "high": 8
+        },
+        {
+          "zone": "The Dalles",
+          "low": 1,
+          "high": 7
+        },
+        {
+          "zone": "Lyle",
+          "low": 2,
+          "high": 9
+        },
+        {
+          "zone": "Rufus",
+          "low": 1,
+          "high": 8
+        },
+        {
+          "zone": "Arlington",
+          "low": 0,
+          "high": 8
         }
       ]
     }
