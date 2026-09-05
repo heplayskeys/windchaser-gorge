@@ -277,7 +277,7 @@ TIME_SEGMENT_KEYWORDS = [
     ("early", ("early wind", "early")),
     ("morning", ("late morning", "morning")),
     ("afternoon", ("afternoon",)),
-    ("evening", ("evening", "late day", "by evening")),
+    ("evening", ("evening", "late day", "by evening", "executive session", "sunset session")),
     ("night", ("overnight", "tonight", "night")),
 ]
 
@@ -372,19 +372,86 @@ def merge_zone_periods(all_lists):
             else:
                 merged[key]["low"] = min(merged[key]["low"], e["low"])
                 merged[key]["high"] = max(merged[key]["high"], e["high"])
+                # Direction only comes from the windtable OCR path (prose
+                # entries never carry it) -- adopt it from whichever
+                # source has it, regardless of which one got inserted
+                # first for this zone+period.
+                if not merged[key].get("direction") and e.get("direction"):
+                    merged[key]["direction"] = e["direction"]
     return list(merged.values())
 
 
 
+# 16-point compass, in the same order/spacing as the frontend's
+# degToCompass() in index.html -- kept identical so a bearing resolved
+# here and one resolved client-side always agree on the same abbreviation.
+COMPASS_POINTS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE",
+                   "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+_VALID_COMPASS = set(COMPASS_POINTS)
+_WORD_TO_COMPASS = {
+    "north": "N", "south": "S", "east": "E", "west": "W",
+    "northeast": "NE", "northwest": "NW", "southeast": "SE", "southwest": "SW",
+}
+
+
+def deg_to_compass(deg: float) -> str:
+    return COMPASS_POINTS[round((deg % 360) / 22.5) % 16]
+
+
 def extract_direction(text: str):
     """
-    Overall prevailing wind direction, converted to the *-erly term
-    (westerly = wind FROM the west). Picks the first cardinal direction
-    mentioned near the word 'wind'.
+    Wind direction FROM which the wind blows, as a compass abbreviation
+    (e.g. 'WSW'), at whatever granularity the source text actually
+    supports. Checked most to least precise:
+
+    1. An exact bearing. Victor occasionally reports his own station
+       readings inline, e.g. "from WSW248*" or "from NE 37*" (his site
+       renders the degree symbol as "*"). The digits are authoritative
+       here -- resolved through the same 16-point table as the frontend,
+       rather than trusting the adjacent letters verbatim, in case a
+       transcription mismatch ever occurs between the two.
+    2. A compass abbreviation without a degree, e.g. Victor's "SW FLOW"
+       shorthand for prevailing airflow direction.
+    3. A compound or bare cardinal word attached to "wind"/"erly", e.g.
+       "southwest wind" or "westerly". This is the common case -- neither
+       source reliably goes finer than this most days -- and is the only
+       tier the original parser supported.
+
+    Returns None if nothing matches, letting the caller pick a default.
     """
-    m = re.search(r"\b(west|east|north|south)(?:erly)?\s+wind", text, re.I)
+    m = re.search(r"\bfrom\s+([NSEW]{1,3})\s*(\d{1,3})\s*\*", text, re.I)
+    if m and m.group(1).upper() in _VALID_COMPASS:
+        degrees = int(m.group(2))
+        if 0 <= degrees <= 360:
+            return deg_to_compass(degrees)
+
+    m = re.search(
+        r"\b(NNE|ENE|ESE|SSE|SSW|WSW|WNW|NNW|NE|SE|SW|NW|N|S|E|W)\s+FLOW\b",
+        text, re.I,
+    )
     if m:
-        return m.group(1).lower() + "erly"
+        return m.group(1).upper()
+
+    m = re.search(
+        r"\b(northeast|northwest|southeast|southwest|north|south|east|west)(?:erl(?:y|ies))?\s+winds?\b",
+        text, re.I,
+    )
+    if m:
+        return _WORD_TO_COMPASS[m.group(1).lower()]
+
+    # Weakest signal: a bare compound/cardinal word with no "wind" adjacent
+    # at all -- looser than the tier above, but this is what the original
+    # per-day narrative walker relied on (Temira's day-by-day prose often
+    # states a direction as a standalone word, e.g. "West, building through
+    # the afternoon", with no "wind" immediately following it). Only reached
+    # when nothing stronger matched anywhere in the text.
+    m = re.search(
+        r"\b(northeast|northwest|southeast|southwest|north|south|east|west)(?:erl(?:y|ies))?\b",
+        text, re.I,
+    )
+    if m:
+        return _WORD_TO_COMPASS[m.group(1).lower()]
+
     return None
 
 
@@ -419,9 +486,9 @@ def parse_daily_mentions(text: str):
                 rec["low"] = lo if rec["low"] is None else min(rec["low"], lo)
                 rec["high"] = hi if rec["high"] is None else max(rec["high"], hi)
 
-        dir_match = re.search(r"\b(west|east|north|south)(?:erly)?", sentence, re.I)
-        if dir_match and current_day in days:
-            days[current_day]["direction"] = dir_match.group(1).lower() + "erly"
+        sentence_dir = extract_direction(sentence)
+        if sentence_dir and current_day in days:
+            days[current_day]["direction"] = sentence_dir
 
     return days
 
@@ -718,6 +785,44 @@ def _match_windtable_label(label_text):
     return None
 
 
+# Temira's table sometimes shows a near-calm reading as a code rather than
+# a number range: LTV (light/variable), LTW (light westerly), LTE (light
+# easterly) -- confirmed against her own usage of these same codes in the
+# Coast/Jones Beach section of the same page. These are real, meaningful
+# readings ("basically no wind here"), not missing data, so they're mapped
+# to a near-zero range instead of being skipped -- skipping them left a
+# silent gap that could get backfilled with an unrelated number from
+# prose-based extraction during merge_zone_periods, which is almost
+# certainly the source of previously-seen "conflicting" numbers on days
+# with genuinely light wind.
+LIGHT_WIND_DIRECTION = {"V": None, "W": "W", "E": "E"}
+LIGHT_WIND_RANGE = (0, 5)  # treated as "essentially no wind" for our purposes
+
+
+def _parse_windtable_cell(cell_text):
+    """
+    Parses one OCR'd table cell into (low, high, direction), or None if the
+    cell has no interpretable wind reading at all (e.g. "BUILDING",
+    "clearing" -- genuine qualitative status text, correctly left alone).
+
+    direction is populated when a number is directly preceded by E or W
+    (e.g. "W15-20", "E 10-15" -- Temira's shorthand for which way that
+    period's wind is expected from) or implied by an LTW/LTE code; it's
+    None for a plain number range or for LTV, where no single direction is
+    implied.
+    """
+    code_match = re.match(r"^\s*L\s*T\s*([VWE])\b", cell_text, re.I)
+    if code_match:
+        lo, hi = LIGHT_WIND_RANGE
+        return (lo, hi, LIGHT_WIND_DIRECTION[code_match.group(1).upper()])
+
+    m = re.search(r"\b([EW])?\s*(\d{1,2})-(\d{1,2})", cell_text, re.I)
+    if not m:
+        return None
+    direction = m.group(1).upper() if m.group(1) else None
+    return (int(m.group(2)), int(m.group(3)), direction)
+
+
 def extract_windtable(image_bytes):
     """
     Full pipeline: detect each row's color band, OCR its label column and
@@ -753,11 +858,11 @@ def extract_windtable(image_bytes):
             cx0 = int(data_x0 + i * col_w)
             cx1 = int(data_x0 + (i + 1) * col_w)
             cell_text = _ocr_crop(img, (cx0, max(0, y0 - 2), cx1, y1 + 2))
-            m = re.search(r"(\d{1,2})-(\d{1,2})", cell_text)
-            if not m:
-                continue  # non-numeric cell (e.g. "BUILDING", "clearing") — skip, don't shift
-            lo, hi = int(m.group(1)), int(m.group(2))
-            results.append({"zone": zone, "period": period, "low": lo, "high": hi})
+            parsed = _parse_windtable_cell(cell_text)
+            if not parsed:
+                continue  # non-numeric, non-code cell (e.g. "BUILDING") — skip, don't shift
+            lo, hi, direction = parsed
+            results.append({"zone": zone, "period": period, "low": lo, "high": hi, "direction": direction})
 
     return results
 
@@ -849,10 +954,12 @@ def scrape_gorge_gym():
     for e in windtable_entries:
         z = e["zone"]
         if z not in windtable_alldae:
-            windtable_alldae[z] = {"zone": z, "low": e["low"], "high": e["high"]}
+            windtable_alldae[z] = {"zone": z, "low": e["low"], "high": e["high"], "direction": e.get("direction")}
         else:
             windtable_alldae[z]["low"] = min(windtable_alldae[z]["low"], e["low"])
             windtable_alldae[z]["high"] = max(windtable_alldae[z]["high"], e["high"])
+            if not windtable_alldae[z].get("direction") and e.get("direction"):
+                windtable_alldae[z]["direction"] = e["direction"]
     combined_zones = merge_zones([prose_zones, list(windtable_alldae.values())])
 
     return {
@@ -881,6 +988,8 @@ def merge_zones(all_zone_lists):
             else:
                 merged[key]["low"] = min(merged[key]["low"], z["low"])
                 merged[key]["high"] = max(merged[key]["high"], z["high"])
+                if not merged[key].get("direction") and z.get("direction"):
+                    merged[key]["direction"] = z["direction"]
 
     def sort_key(item):
         key = item[0]
@@ -1030,7 +1139,7 @@ def main():
 
     # Overall prevailing direction, checked across both sources
     combined_text = " ".join(s.get("forecast_text", "") for s in result["sources"])
-    result["direction"] = extract_direction(combined_text) or "westerly"  # Gorge defaults westerly most of the season
+    result["direction"] = extract_direction(combined_text) or "W"  # Gorge defaults west most of the season
 
     # Weekly outlook, parsed from Temira's longer-term section (Victor's site
     # has no equivalent multi-day breakdown to draw from)

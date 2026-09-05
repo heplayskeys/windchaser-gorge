@@ -306,7 +306,7 @@
 
   .zone-row { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.7rem; }
   .zone-row-empty { opacity: 0.45; }
-  .zone-row-empty .zone-value, .zone-row-empty .zone-kite { color: var(--text-low); }
+  .zone-row-empty .zone-value { color: var(--text-low); }
   .zone-row:last-child { margin-bottom: 0; }
   .zone-label { flex: 0 0 88px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-mid); text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem; }
   .zone-label .check { color: var(--yellow); font-weight: 700; }
@@ -314,13 +314,9 @@
   .zone-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 4px; }
   .zone-fill.confirmed { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.55); }
   .zone-value { flex: 0 0 52px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--text-mid); }
-  .zone-kite { flex: 0 0 54px; font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); text-align: right; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
   .legend { display: flex; flex-wrap: wrap; gap: 0.55rem 0.9rem; margin-top: 1rem; padding-top: 0.9rem; border-top: 1px solid var(--panel-line); font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-mid); }
   .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
   .swatch { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
-  .zone-caption-row { display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem; margin-bottom: 0.6rem; }
-  .zone-caption-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--text-low); }
-  .zone-caption-icon { color: var(--text-low); flex: 0 0 auto; }
   .period-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
   .period-buttons button {
     font-family: 'IBM Plex Mono', monospace;
@@ -350,7 +346,6 @@
     min-height: 36px;
   }
   .zone-toggle-all button:hover { color: var(--text-hi); border-color: var(--text-low); }
-  .zone-kite-header { flex: 0 0 54px; text-align: right; line-height: 1; color: var(--text-mid); display: flex; justify-content: flex-end; border-left: 1px solid var(--panel-line); padding-left: 0.5rem; }
   .skull-swatch { width: auto; height: auto; font-size: 0.75rem; line-height: 1; background: none !important; }
 
   .outlook-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
@@ -379,7 +374,6 @@
   .outlook-day .arrow-wrap svg { width: 18px; height: 18px; flex: 0 0 auto; }
   .outlook-day .dir-letter { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 700; }
   .outlook-day .range { font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 0.98rem; line-height: 1; }
-  .outlook-day .kite { font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text-low); margin-top: 0.3rem; line-height: 1.3; }
 
   /* ---------- Tappable pills as auto-dismissing tooltips (JS-controlled, not native <details>) ---------- */
   .chip-pop { position: relative; display: inline-block; }
@@ -678,7 +672,6 @@ html.a11y .zone-value { flex: 0 0 76px; }
 html.a11y .zone-track { flex: 0.6 1 auto; }
 html.a11y h2 { font-size: 1.5rem; }
 html.a11y .agreement .txt { font-size: 1.05rem; }
-html.a11y .zone-kite, html.a11y .zone-kite-header, html.a11y .zone-caption-row { display: none; }
 html.a11y .sub, html.a11y .credibility, html.a11y .pill, html.a11y .segmented a,
 html.a11y .outlook-day .range, html.a11y .live-loading, html.a11y .badge {
   font-size: 0.95rem;
@@ -749,7 +742,7 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
       <path id="gaugeArc" fill="none" stroke-linecap="butt"></path>
     </svg>
     <div class="gauge-readout">
-      <div class="range" id="rangeReadout">— <span>KN · WESTERLY</span></div>
+      <div class="range" id="rangeReadout">— <span>KN · W</span></div>
       <div class="call" id="callText">Reading today's forecasts…</div>
     </div>
   </section>
@@ -762,16 +755,8 @@ html.a11y *, html.a11y *::before, html.a11y *::after {
         <span class="card-date" id="zonesDate"></span>
       </div>
     </div>
-    <div class="sub" id="zonesSub">Today's wind — WESTERLY</div>
+    <div class="sub" id="zonesSub">Today's wind — W</div>
     <div class="period-buttons" id="periodButtons"></div>
-    <div class="zone-caption-row">
-      <span class="zone-caption-label">Kite size</span>
-      <svg viewBox="0 0 100 100" width="14" height="14" class="zone-caption-icon" title="Recommended kite size">
-        <path d="M2,60 A48,48 0 0 1 98,60 L82,60 A32,32 0 0 0 18,60 Z" fill="currentColor"/>
-        <path d="M6,58 L48,92 M94,58 L52,92" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="50" cy="94" rx="7" ry="8" fill="currentColor"/>
-      </svg>
-    </div>
     <div id="zoneRows"></div>
     <div class="legend" id="windLegend"></div>
   </section>
@@ -849,31 +834,37 @@ function mphToKn(mph) { return Math.round(mph * KN_PER_MPH); }
 
 const PREFERRED_KN = 30; // your friend's favorite riding speed
 
-// Single source of truth for wind speed -> color/label/kite size, used
-// consistently by the gauge, zone chart, weekly outlook, and chips.
-// All thresholds are in KNOTS. Kite sizes are tuned to a specific known
-// rider: ~140lb, riding a directional surfboard (not twin-tip) — adjust
-// for your own weight, board, and quiver.
+// Single source of truth for wind speed -> color/label, used consistently
+// by the gauge, zone chart, weekly outlook, and chips. All thresholds are
+// in KNOTS.
 const WIND_BANDS = [
-  { max: 10, color: '#8ED0F0', ink: '#062033', label: 'Light',       kite: '14m+' },
-  { max: 15, color: '#3E8FD0', ink: '#F5FBFF', label: 'Breezy',      kite: '12–14m' },
-  { max: 20, color: '#4FBE7D', ink: '#062015', label: 'Good',        kite: '10–12m' },
-  { max: 25, color: '#FFC93C', ink: '#241B02', label: 'Strong',      kite: '8–10m' },
-  { max: 30, color: '#F0973A', ink: '#2B1400', label: 'Very Strong', kite: '6–8m' },
-  { max: 40, color: '#E8433A', ink: '#FFF3F0', label: 'Extreme',     kite: '4–6m' },
-  { max: 45, color: '#F45FC0', ink: '#2B0620', label: 'Severe',      kite: '3–4m' },
-  { max: Infinity, color: '#000000', ink: '#FF6FCF', label: 'Danger', kite: '💀', skull: true },
+  { max: 10, color: '#8ED0F0', ink: '#062033', label: 'Light' },
+  { max: 15, color: '#3E8FD0', ink: '#F5FBFF', label: 'Breezy' },
+  { max: 20, color: '#4FBE7D', ink: '#062015', label: 'Good' },
+  { max: 25, color: '#FFC93C', ink: '#241B02', label: 'Strong' },
+  { max: 30, color: '#F0973A', ink: '#2B1400', label: 'Very Strong' },
+  { max: 40, color: '#E8433A', ink: '#FFF3F0', label: 'Extreme' },
+  { max: 45, color: '#F45FC0', ink: '#2B0620', label: 'Severe' },
+  { max: Infinity, color: '#000000', ink: '#FF6FCF', label: 'Danger', skull: true },
 ];
 function windBand(mph) { return WIND_BANDS.find(b => mph <= b.max) || WIND_BANDS[WIND_BANDS.length - 1]; }
-function kiteSizeForMph(mph) { return windBand(mph).kite; }
 
+// Direction now arrives as a 16-point compass abbreviation from the source
+// text (e.g. 'WSW', 'NE') rather than the old 4-word westerly/easterly/
+// northerly/southerly categories -- see scraper.py's extract_direction for
+// how that granularity gets pulled from the scraped prose. COMPASS_POINTS
+// mirrors degToCompass()'s own table further below, so a bearing resolved
+// on the backend and one resolved here always agree.
+const COMPASS_POINTS = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+function compassToDeg(point) {
+  const idx = COMPASS_POINTS.indexOf((point || '').toUpperCase());
+  return idx === -1 ? 12 * 22.5 : idx * 22.5; // unknown -> W (270deg), matching the old default
+}
 // Arrow rotation = direction the wind is blowing TOWARD (not from), which is
 // the more intuitive read for "which way will I be riding" — 0deg = up/north.
-const TOWARD_DEG = { westerly: 90, easterly: 270, northerly: 180, southerly: 0 };
-const TOWARD_LETTER = { westerly: 'E', easterly: 'W', northerly: 'S', southerly: 'N' };
-function directionArrowDeg(dir) { return TOWARD_DEG[dir] ?? 90; }
-function directionLetter(dir) { return TOWARD_LETTER[dir] || 'E'; }
-function directionLabel(dir) { return dir ? dir.charAt(0).toUpperCase() + dir.slice(1) : 'Westerly'; }
+function directionArrowDeg(dir) { return (compassToDeg(dir) + 180) % 360; }
+function directionLetter(dir) { return degToCompass((compassToDeg(dir) + 180) % 360); }
+function directionLabel(dir) { return dir ? dir.toUpperCase() : 'W'; }
 
 const FLAG_ICONS = {
   'Fire Danger': '🔥',
@@ -1314,13 +1305,13 @@ async function loadData() {
             "Stevenson",
             "Viento"
       ],
-      "direction": "westerly",
+      "direction": "W",
       "weekly_outlook": [
             {
                   "day": "Fri",
                   "low": 7,
                   "high": 29,
-                  "direction": "westerly"
+                  "direction": "W"
             },
             {
                   "day": "Sat",
@@ -2250,13 +2241,13 @@ function renderLegend() {
 }
 
 let currentOutlookDays = [];
-let currentOutlookDirection = 'westerly';
+let currentOutlookDirection = 'W';
 
 function outlookDayHTML(d, idx) {
   if (d.loKn == null || d.hiKn == null) {
     return `<div class="outlook-day empty"><div class="dname">${d.day}</div><div class="none">No data</div></div>`;
   }
-  const dir = d.direction || currentOutlookDirection || 'westerly';
+  const dir = d.direction || currentOutlookDirection || 'W';
   const deg = directionArrowDeg(dir);
   const letter = directionLetter(dir);
   // Color reflects the weighted "typical" value across locations, not the
@@ -2273,14 +2264,13 @@ function outlookDayHTML(d, idx) {
         <span class="dir-letter" style="color:${band.ink}">${letter}</span>
       </div>
       <div class="range" style="color:${band.ink}">${d.loKn}–${d.hiKn}</div>
-      <div class="kite" style="color:${band.ink};opacity:0.85">${band.kite}</div>
     </button>`;
 }
 
 function renderOutlook(days, fallbackDirection, weeklyLocationForecast) {
   const topRow = document.getElementById('outlookRowTop');
   const bottomRow = document.getElementById('outlookRowBottom');
-  currentOutlookDirection = fallbackDirection || 'westerly';
+  currentOutlookDirection = fallbackDirection || 'W';
   if (!days || !days.length) {
     topRow.innerHTML = `<div style="font-family:'IBM Plex Mono',monospace;font-size:0.78rem;color:var(--text-mid);">No multi-day breakdown available today — check Temira's full forecast for the extended outlook.</div>`;
     bottomRow.innerHTML = '';
@@ -2328,7 +2318,7 @@ function renderOutlook(days, fallbackDirection, weeklyLocationForecast) {
 function openOutlookModal(idx) {
   const d = currentOutlookDays[idx];
   if (!d || d.loKn == null || d.hiKn == null) return;
-  const dir = d.direction || currentOutlookDirection || 'westerly';
+  const dir = d.direction || currentOutlookDirection || 'W';
   const band = windBand(d.avgKn != null ? d.avgKn : d.hiKn);
 
   const sourceLabel = d.source === 'scraped'
@@ -2353,7 +2343,6 @@ function openOutlookModal(idx) {
     ${sourceLabel ? `<div class="outlook-modal-source">${sourceLabel}</div>` : ''}
     <div class="outlook-modal-range" style="color:${band.color}">${d.loKn}<span>–</span>${d.hiKn}<span class="unit">kn</span></div>
     <div class="outlook-modal-row"><span class="lbl">Direction</span><span class="val">${directionLabel(dir)}</span></div>
-    <div class="outlook-modal-row"><span class="lbl">Recommended kite</span><span class="val">${band.kite}</span></div>
     <div class="outlook-modal-row"><span class="lbl">Conditions</span><span class="val">${band.label}</span></div>
     ${zonesHTML}
   `;
@@ -2392,13 +2381,11 @@ function renderZoneChart(rows) {
         <div class="zone-label">${r.zone}</div>
         <div class="zone-track"></div>
         <div class="zone-value">–</div>
-        <div class="zone-kite">–</div>
       </div>`;
     }
     const loKn = mphToKn(r.low), hiKn = mphToKn(r.high);
     const leftPct = (loKn / maxScale) * 100;
     const widthPct = ((hiKn - loKn) / maxScale) * 100;
-    const kite = windBand(hiKn).kite;
     const marks = tallyMarkColors(loKn, hiKn);
     const barHTML = `<div class="zone-tally" style="left:${leftPct}%;width:${Math.max(widthPct,3)}%;">${marks.map(c => `<span style="background:${c}"></span>`).join('')}</div>`;
     return `
@@ -2406,7 +2393,6 @@ function renderZoneChart(rows) {
         <div class="zone-label">${r.zone}</div>
         <div class="zone-track">${barHTML}</div>
         <div class="zone-value">${loKn}–${hiKn}kn</div>
-        <div class="zone-kite">${kite}</div>
       </div>`;
   }).join('');
 }
@@ -2462,9 +2448,9 @@ function updateGlanceAndZones(period) {
   const highBand = hiKn !== null ? windBand(hiKn) : null;
 
   document.getElementById('rangeReadout').innerHTML =
-    (loKn !== null ? `${loKn}–${hiKn}` : '—') + ` <span>KN · ${directionLabel(currentData.direction).toUpperCase()}</span>`;
+    (loKn !== null ? `${loKn}–${hiKn}` : '—') + ` <span>KN · ${directionLabel(currentData.direction)}</span>`;
   if (highBand) document.getElementById('rangeReadout').style.color = highBand.color;
-  document.getElementById('zonesSub').textContent = `Today's wind — ${directionLabel(currentData.direction).toUpperCase()}`;
+  document.getElementById('zonesSub').textContent = `Today's wind — ${directionLabel(currentData.direction)}`;
 
   const periodLabel = `<span class="sub-note">Viewing: ${period}</span><br>`;
   const bestSpotName = (hiKn !== null && hiKn < 15) ? '<span class="pineapple">🍍</span>' : (best ? best.zone : null);
